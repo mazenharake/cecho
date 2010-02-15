@@ -56,6 +56,11 @@ have them if you compiled erlang on the same machine).
 Note2: The file cecho_commands.hrl is _generated_ it is not suppose to exist
 in the include directory.
 
+Usage:
+The intention of this library is to have an API as close as possible to the 
+ncurses library. Something things can't be translated and other things return
+values instead of taking pointer arguments etc. Documentation is planned ASAP.
+
 Examples:
 There are several ways to run the examples but the easiest would be to run erl
 from the root directory of cecho and then invoke the M:F(A). from the shell.
