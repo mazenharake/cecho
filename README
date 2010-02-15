@@ -55,3 +55,23 @@ have them if you compiled erlang on the same machine).
 
 Note2: The file cecho_commands.hrl is _generated_ it is not suppose to exist
 in the include directory.
+
+Examples:
+There are several ways to run the examples but the easiest would be to run erl
+from the root directory of cecho and then invoke the M:F(A). from the shell.
+
+E.g:
+
+$> erl -pa ebin
+
+Erlang (BEAM) emulator version 5.6.5 [source] [async-threads:0] [kernel-poll:false]
+
+Eshell V5.6.5  (abort with ^G)
+1> cecho_example:simple().
+
+=INFO REPORT==== 15-Feb-2010::17:22:46 ===
+    application: cecho
+    exited: stopped
+    type: temporary
+ok
+2> 
