@@ -37,72 +37,81 @@
 -export([refresh/0, cbreak/0, nocbreak/0, echo/0, noecho/0, addch/1, addstr/1,
 	 move/2, getyx/0, getmaxyx/0, curs_set/1, erase/0, has_colors/0,
 	 start_color/0, init_pair/3, attron/1, attroff/1, nl/0, nonl/0,
-	 scrollok/1]).
+	 scrollok/1, mvaddch/3, mvaddstr/3]).
 
 %% =============================================================================
 %% Application API
 %% =============================================================================
 refresh() ->
-    cmd_call(?REFRESH).
+    call(?REFRESH).
 
 cbreak() -> 
-    cmd_call(?CBREAK).
+    call(?CBREAK).
 
 nocbreak() -> 
-    cmd_call(?NOCBREAK).
+    call(?NOCBREAK).
 
 echo() -> 
-    cmd_call(?ECHO).
+    call(?ECHO).
 
 noecho() -> 
-    cmd_call(?NOECHO).
+    call(?NOECHO).
 
 addch(Char) when is_integer(Char) andalso Char >= 0 andalso Char =< 255 ->
-    cmd_call(?ADDCH, Char).
+    call(?ADDCH, Char).
 
 addstr(String) when is_list(String) ->
     Str = lists:flatten(String),
-    cmd_call(?ADDSTR, {erlang:iolist_size(Str), Str}).
+    call(?ADDSTR, {erlang:iolist_size(Str), Str}).
 
 move(Y, X) when is_integer(X) andalso is_integer(Y) ->
-    cmd_call(?MOVE, {Y, X}).
+    call(?MOVE, {Y, X}).
 
 getyx() ->
-    cmd_call(?GETYX).
+    call(?GETYX).
 
 getmaxyx() ->
-    cmd_call(?GETMAXYX).
+    call(?GETMAXYX).
 
 curs_set(Flag) when is_integer(Flag) ->
-    cmd_call(?CURS_SET, Flag).
+    call(?CURS_SET, Flag).
 
 erase() ->
-    cmd_call(?ERASE).
+    call(?ERASE).
 
 has_colors() ->
-    cmd_call(?HAS_COLORS).
+    call(?HAS_COLORS).
 
 start_color() ->
-    cmd_call(?START_COLOR).
+    call(?START_COLOR).
 
 init_pair(N, FColor, BColor) when is_integer(N) andalso is_integer(FColor)
 				  andalso is_integer(BColor) ->
-    cmd_call(?INIT_PAIR, {N, FColor, BColor}).
+    call(?INIT_PAIR, {N, FColor, BColor}).
 
 attron(Mask) when is_integer(Mask) ->
-    cmd_call(?ATTRON, Mask).
+    call(?ATTRON, Mask).
 
 attroff(Mask) when is_integer(Mask) ->
-    cmd_call(?ATTROFF, Mask).
+    call(?ATTROFF, Mask).
 
 nl() ->
-    cmd_call(?NL).
+    call(?NL).
 
 nonl() ->
-    cmd_call(?NONL).
+    call(?NONL).
 
 scrollok(BFlag) when is_boolean(BFlag) ->
-    cmd_call(?SCROLLOK, BFlag).
+    call(?SCROLLOK, BFlag).
+
+mvaddch(Y, X, Char) when is_integer(Char) andalso Char >= 0 andalso Char =< 255
+                         andalso is_integer(X) andalso is_integer(Y) ->
+    call(?MVADDCH, {Y, X, Char}).
+
+mvaddstr(Y, X, String) when is_list(String) andalso is_integer(X) andalso 
+			    is_integer(Y) ->
+    Str = lists:flatten(String),
+    call(?MVADDSTR, {Y, X, erlang:iolist_size(Str), Str}).
 
 %% =============================================================================
 %% Behaviour Callbacks
@@ -116,8 +125,8 @@ stop(_) ->
 %% =============================================================================
 %% Internal Functions
 %% =============================================================================
-cmd_call(Cmd) ->
-    cmd_call(Cmd, []).
+call(Cmd) ->
+    call(Cmd, []).
 
-cmd_call(Cmd, Args) ->
+call(Cmd, Args) ->
     cecho_srv:call(Cmd, Args).

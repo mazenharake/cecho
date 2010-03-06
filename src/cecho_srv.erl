@@ -35,7 +35,7 @@
 	 code_change/3]).
 
 %% Module API
--export([start_link/0, call/2]).
+-export([start_link/0, call/2 ]).
 
 %% Records
 -record(state, { port }).
@@ -47,7 +47,7 @@ start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, no_args, []).
 
 call(Cmd, Args) ->
-    gen_server:call(?MODULE, {Cmd, Args}).
+    gen_server:call(?MODULE, {call, Cmd, Args}, infinity).
 
 %% =============================================================================
 %% Behaviour Callbacks
@@ -57,20 +57,20 @@ init(no_args) ->
     case erl_ddll:load("./priv/lib","cecho") of
 	ok ->
 	    Port = erlang:open_port({spawn, "cecho"}, []),
-	    ok = ctrl(Port, ?INITSCR),
-	    ok = ctrl(Port, ?ERASE),
+	    ok = do_call(Port, ?INITSCR),
+	    ok = do_call(Port, ?ERASE),
 	    {ok, #state{ port = Port }};
 	{error, ErrorCode} ->
 	    exit({driver_error, erl_ddll:format_error(ErrorCode)})
     end.
 
-handle_call({Cmd, Args}, _From, State) ->
-    Response = ctrl(State#state.port, Cmd, Args),
+handle_call({call, Cmd, Args}, _From, State) ->
+    Response = do_call(State#state.port, Cmd, Args),
     {reply, Response, State}.
 
 terminate(_Reason, State) ->
-    ctrl(State#state.port, ?ENDWIN),
-    ctrl(State#state.port, ?CURS_SET, ?ceCURS_NORMAL),
+    do_call(State#state.port, ?ENDWIN),
+    do_call(State#state.port, ?CURS_SET, ?ceCURS_NORMAL),
     erlang:port_close(State#state.port),
     erl_ddll:unload("cecho").
 
@@ -89,8 +89,8 @@ code_change(_, State, _) ->
 %% =============================================================================
 %% Internal Functions
 %% =============================================================================
-ctrl(Port, Cmd) ->
-    ctrl(Port, Cmd, []).
+do_call(Port, Cmd) ->
+    do_call(Port, Cmd, []).
 
-ctrl(Port, Cmd, Args) ->
+do_call(Port, Cmd, Args) ->
     binary_to_term(erlang:port_control(Port, Cmd, term_to_binary(Args))).

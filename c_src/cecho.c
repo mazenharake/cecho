@@ -34,6 +34,7 @@
 #include "erl_interface.h"
 #include "ei.h"
 #include "ncurses.h"
+#include "assert.h"
 
 // State structure
 typedef struct {
@@ -47,6 +48,7 @@ typedef struct {
   ErlDrvPort drv_port;
 } state;
 
+void init_state(state *st, char *args, int argslen);
 void ok(state *st);
 void error(state *st, int code);
 void boolean(state *st, int code);
@@ -81,6 +83,8 @@ void do_attroff(state *st);
 void do_nl(state *st);
 void do_nonl(state *st);
 void do_scrollok(state *st);
+void do_mvaddch(state *st);
+void do_mvaddstr(state *st);
 
 // =============================================================================
 // Erlang Callbacks
@@ -98,14 +102,8 @@ static void stop(ErlDrvData drvstate) {
 
 static int ctrl(ErlDrvData drvstate, unsigned int command, char *args, 
 		int argslen, char **rbuf, int rbuflen) {
-
   state *st = (state *)drvstate;
-  st->index = 0;
-  st->version = 0;
-  st->args = args;
-  st->argslen = argslen;
-  ei_decode_version(st->args, &(st->index), &(st->version));
-  ei_x_new_with_version(&(st->eixb));
+  init_state(st, args, argslen);
 
   switch (command) {
   case ENDWIN: do_endwin(st); break;
@@ -130,6 +128,8 @@ static int ctrl(ErlDrvData drvstate, unsigned int command, char *args,
   case NL: do_nl(st); break;
   case NONL: do_nonl(st); break;
   case SCROLLOK: do_scrollok(st); break;
+  case MVADDCH: do_mvaddch(st); break;
+  case MVADDSTR: do_mvaddstr(st); break;
   default: break;
   }
   
@@ -196,7 +196,7 @@ void do_addstr(state *st) {
 
 void do_move(state *st) {
   int arity;
-  long x, y;
+  long y, x;
   ei_decode_tuple_header(st->args, &(st->index), &arity);
   ei_decode_long(st->args, &(st->index), &y);
   ei_decode_long(st->args, &(st->index), &x);
@@ -275,9 +275,44 @@ void do_scrollok(state *st) {
   scrollok(st->mwin, FALSE);
 }
 
+void do_mvaddch(state *st) {
+  char ch = 0;
+  int arity;
+  long y, x;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &y);
+  ei_decode_long(st->args, &(st->index), &x);
+  ei_decode_char(st->args, &(st->index), &ch);
+  encode_ok_reply(st, mvaddch((int)y, (int)x, ch));
+}
+
+void do_mvaddstr(state *st) {
+  int arity;
+  long strlen, y, x;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &y);
+  ei_decode_long(st->args, &(st->index), &x);
+  ei_decode_long(st->args, &(st->index), &strlen);
+  char str[strlen];
+  ei_decode_string(st->args, &(st->index), str);
+  encode_ok_reply(st, mvaddnstr((int)y, (int)x, str, (int)strlen));
+}
+   
+
 // =============================================================================
 // Utility functions
 // ===========================================================================
+void init_state(state *st, char *args, int argslen) {
+  st->index = 0;
+  st->version = 0;
+  st->args = args;
+  st->argslen = argslen;
+  ei_decode_version(st->args, &(st->index), &(st->version));
+  assert(st->version != 0);
+  assert(st->index != 0);
+  ei_x_new_with_version(&(st->eixb));
+}
+
 void ok(state *st) {
   atom(&(st->eixb), "ok", 2);
 }

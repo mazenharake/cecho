@@ -9,10 +9,10 @@ ECFLAGS     := +debug_info +strict_record_tests +netload
 EDEF        := include/cecho_commands.hrl
 CDEF        := $(patsubst %.hrl, %.h, $(EDEF))
 
-ERLDIR      := /usr/local/lib/erlang
+ERLDIR      := /home/mazen/lib/erlang/
 DRIVER      := priv/lib/cecho.so
-CFLAGS      := -g -Iinclude -I$(ERLDIR)/erts-5.6.5/include -I$(ERLDIR)/lib/erl_interface-3.5.9/include
-LDFLAGS     := -L$(ERLDIR)/lib/erl_interface-3.5.9/lib
+CFLAGS      := -g -Iinclude -I$(ERLDIR)/erts-5.7.4/include -I$(ERLDIR)/lib/erl_interface-3.6.4/include
+LDFLAGS     := -L$(ERLDIR)/lib/erl_interface-3.6.4/lib
 
 all: $(EDEF) $(BEAMS) $(DRIVER)
 

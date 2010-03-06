@@ -165,3 +165,68 @@ pos(Y, X) ->
     cecho:refresh(),
     timer:sleep(2000),
     application:stop(cecho).
+
+%% 
+%% Prints a number continuously as another io thread is waiting for keyinput
+%%
+input() ->
+    application:start(cecho),
+    ok = cecho:cbreak(),
+    ok = cecho:noecho(),
+    ok = cecho:curs_set(?ceCURS_INVISIBLE),
+    spawn_link(?MODULE, input_counter, [0]),
+    cecho:mvaddstr(9, 10, "Enter:    "),
+    cecho:refresh(),
+    input_reader().
+
+input_reader() ->
+    [P] = io:get_chars('',1),
+    case P of
+	113 ->
+	    application:stop(cecho);
+	_ ->
+	    cecho:mvaddstr(9, 17, io_lib:format("~p  ",[P])),
+	    cecho:refresh(),
+	    input_reader()
+    end.
+
+input_counter(N) ->
+    cecho:mvaddstr(10, 10, io_lib:format("# ~p",[N])),
+    cecho:refresh(),
+    timer:sleep(100),
+    input_counter(N+1).
+
+
+%%
+%% cursmove - move the '@' around the screen with the arrow keys. 'q' to quit.
+%%
+cursmove() ->
+    application:start(cecho),
+    cecho:cbreak(),
+    cecho:noecho(),
+    cecho:curs_set(?ceCURS_INVISIBLE),
+    cecho:mvaddch(10, 10, $@),
+    cecho:move(10,10),
+    cecho:refresh(),
+%    upd_pos(),
+    moveloop().
+
+moveloop() ->
+    [C] = io:get_chars("",1),
+    case C of
+	$q -> application:stop(cecho);
+	65 -> mv(-1, 0); %% Up
+	66 -> mv(1, 0); %% Down
+	67 -> mv(0, 1); %% Right
+	68 -> mv(0, -1); %% Left
+	C -> ok
+    end,
+    cecho:refresh(),
+    moveloop().
+
+mv(OffsetY, OffsetX) ->
+    {CY, CX} = cecho:getyx(),
+    FinalY = CY+(OffsetY),
+    FinalX = CX+(OffsetX),
+    cecho:mvaddch(FinalY,FinalX,$@),
+    cecho:move(FinalY, FinalX).

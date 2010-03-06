@@ -47,3 +47,5 @@
 #define NL 19
 #define NONL 20
 #define SCROLLOK 21
+#define MVADDCH 22
+#define MVADDSTR 23
