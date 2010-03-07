@@ -63,11 +63,18 @@ values instead of taking pointer arguments etc. Documentation is planned ASAP.
 
 Examples:
 There are several ways to run the examples but the easiest would be to run erl
-from the root directory of cecho and then invoke the M:F(A). from the shell.
+from the root directory of cecho and then invoke the M:F(A). from the shell. 
+When possible the application should be run with -noshell. If you want to read
+key input then use io:get_chars("",X) where X is the number of characters you
+want to read (usually 1). Oh and don't use -noinput if you want to read input ;)
+
+NOTE: The '../cecho/ebin' is necessary for the code:priv_dir/1 to work because
+it needs to do some fancy stuff on any path you enter. When ever this library
+is used the path has to include at least "SOMEPATH/cecho/ebin".
 
 E.g:
 
-$> erl -pa ebin
+$> erl -pa ../cecho/ebin
 
 Erlang (BEAM) emulator version 5.6.5 [source] [async-threads:0] [kernel-poll:false]
 
@@ -80,3 +87,7 @@ Eshell V5.6.5  (abort with ^G)
     type: temporary
 ok
 2> 
+
+OR even better:
+
+$> erl -pa ../cecho/ebin/ -noshell -eval 'cecho_example:input(),halt().'

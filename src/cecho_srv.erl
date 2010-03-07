@@ -54,7 +54,7 @@ call(Cmd, Args) ->
 %% =============================================================================
 init(no_args) ->
     process_flag(trap_exit, true),
-    case erl_ddll:load("./priv/lib","cecho") of
+    case erl_ddll:load(code:priv_dir(cecho)++"/lib","cecho") of
 	ok ->
 	    Port = erlang:open_port({spawn, "cecho"}, []),
 	    ok = do_call(Port, ?INITSCR),
