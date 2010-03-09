@@ -59,6 +59,7 @@ init(no_args) ->
 	    Port = erlang:open_port({spawn, "cecho"}, []),
 	    ok = do_call(Port, ?INITSCR),
 	    ok = do_call(Port, ?ERASE),
+	    ok = do_call(Port, ?REFRESH),
 	    {ok, #state{ port = Port }};
 	{error, ErrorCode} ->
 	    exit({driver_error, erl_ddll:format_error(ErrorCode)})

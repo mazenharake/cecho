@@ -38,8 +38,7 @@
 
 // State structure
 typedef struct {
-  WINDOW *mwin;
-  WINDOW *win[_MAXWINDOWS];
+  WINDOW *win[_MAXWINDOWS+1];
   ei_x_buff eixb;
   char *args;
   int argslen;
@@ -169,11 +168,10 @@ void do_endwin(state *st) {
 }
 
 void do_initscr(state *st) {
-  st->mwin = (WINDOW *)initscr();
-  if (st->mwin == NULL) {
+  st->win[0] = (WINDOW *)initscr();
+  if (st->win[0] == NULL) {
     encode_ok_reply(st, -1);
   } else {
-    refresh();
     encode_ok_reply(st, 0);
   }
 }
@@ -225,7 +223,7 @@ void do_move(state *st) {
 
 void do_getyx(state *st) {
   int x, y;
-  getyx(st->mwin, y, x);
+  getyx(st->win[0], y, x);
   tuple(&(st->eixb), 2);
   integer(&(st->eixb), y);
   integer(&(st->eixb), x);
@@ -233,7 +231,7 @@ void do_getyx(state *st) {
 
 void do_getmaxyx(state *st) {
   int x, y;
-  getmaxyx(st->mwin, y, x);
+  getmaxyx(st->win[0], y, x);
   tuple(&(st->eixb), 2);
   integer(&(st->eixb), y);
   integer(&(st->eixb), x);
@@ -289,10 +287,13 @@ void do_nonl(state *st) {
 }
 
 void do_scrollok(state *st) {
+  int arity;
   int bf;
+  long slot;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);
   ei_decode_boolean(st->args, &(st->index), &bf);
-  encode_ok_reply(st, scrollok(st->mwin, bf));
-  scrollok(st->mwin, FALSE);
+  encode_ok_reply(st, scrollok(st->win[slot], bf));
 }
 
 void do_mvaddch(state *st) {
@@ -320,7 +321,7 @@ void do_mvaddstr(state *st) {
    
 void do_newwin(state *st) {
   int slot = findfreewindowslot(st);
-  if (slot >= 0) {
+  if (slot > 0) {
     int arity;
     long height, width, starty, startx;
     ei_decode_tuple_header(st->args, &(st->index), &arity);
@@ -338,7 +339,9 @@ void do_newwin(state *st) {
 void do_delwin(state *st) {
   long slot;
   ei_decode_long(st->args, &(st->index), &slot);
-  if (st->win[slot] == NULL) {
+  if (slot == 0) {
+    boolean(st, FALSE);
+  } else if (st->win[slot] == NULL) {
     boolean(st, FALSE);
   } else if (st->win[slot] != NULL) {
     delwin(st->win[slot]);

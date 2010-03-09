@@ -37,7 +37,7 @@
 -export([refresh/0, cbreak/0, nocbreak/0, echo/0, noecho/0, addch/1, addstr/1,
 	 move/2, getyx/0, getmaxyx/0, curs_set/1, erase/0, has_colors/0,
 	 start_color/0, init_pair/3, attron/1, attroff/1, nl/0, nonl/0,
-	 scrollok/1, mvaddch/3, mvaddstr/3, newwin/4, delwin/1, wmove/3, 
+	 scrollok/2, mvaddch/3, mvaddstr/3, newwin/4, delwin/1, wmove/3, 
 	 waddstr/2, waddch/2, mvwaddstr/4, mvwaddch/4, wrefresh/1]).
 
 %% =============================================================================
@@ -102,8 +102,8 @@ nl() ->
 nonl() ->
     call(?NONL).
 
-scrollok(BFlag) when is_boolean(BFlag) ->
-    call(?SCROLLOK, BFlag).
+scrollok(Window, BFlag) when is_integer(Window) andalso is_boolean(BFlag) ->
+    call(?SCROLLOK, {Window, BFlag}).
 
 mvaddch(Y, X, Char) when is_integer(Char) andalso Char >= 0 andalso Char =< 255
                          andalso is_integer(X) andalso is_integer(Y) ->
