@@ -39,7 +39,7 @@
 // State structure
 typedef struct {
   WINDOW *mwin;
-  WINDOW win[10];
+  WINDOW *win[_MAXWINDOWS];
   ei_x_buff eixb;
   char *args;
   int argslen;
@@ -58,6 +58,7 @@ void atom(ei_x_buff *eixb, const char *str, int size);
 void integer(ei_x_buff *eixb, int integer);
 void string(ei_x_buff *eixb, const char *str);
 void encode_ok_reply(state *st, int code);
+int findfreewindowslot(state *st);
 
 void do_endwin(state *st);
 void do_initscr(state *st);
@@ -85,6 +86,14 @@ void do_nonl(state *st);
 void do_scrollok(state *st);
 void do_mvaddch(state *st);
 void do_mvaddstr(state *st);
+void do_newwin(state *st);
+void do_delwin(state *st);
+void do_wmove(state *st);
+void do_waddstr(state *st);
+void do_waddch(state *st);
+void do_mvwaddstr(state *st);
+void do_mvwaddch(state *st);
+void do_wrefresh(state *st);
 
 // =============================================================================
 // Erlang Callbacks
@@ -93,6 +102,9 @@ static ErlDrvData start(ErlDrvPort port, char *command) {
   state *drvstate = (state *)driver_alloc(sizeof(state));
   drvstate->drv_port = port;
   set_port_control_flags(port, PORT_CONTROL_FLAG_BINARY);
+  int i;
+  for (i = 0; i < _MAXWINDOWS; i++)
+    drvstate->win[i] = NULL;
   return (ErlDrvData)drvstate;
 }
 
@@ -130,6 +142,14 @@ static int ctrl(ErlDrvData drvstate, unsigned int command, char *args,
   case SCROLLOK: do_scrollok(st); break;
   case MVADDCH: do_mvaddch(st); break;
   case MVADDSTR: do_mvaddstr(st); break;
+  case NEWWIN: do_newwin(st); break;
+  case DELWIN: do_delwin(st); break;
+  case WMOVE: do_wmove(st); break;
+  case WADDSTR: do_waddstr(st); break;
+  case WADDCH: do_waddch(st); break;
+  case MVWADDSTR: do_mvwaddstr(st); break;
+  case MVWADDCH: do_mvwaddch(st); break;
+  case WREFRESH: do_wrefresh(st); break;
   default: break;
   }
   
@@ -298,6 +318,96 @@ void do_mvaddstr(state *st) {
   encode_ok_reply(st, mvaddnstr((int)y, (int)x, str, (int)strlen));
 }
    
+void do_newwin(state *st) {
+  int slot = findfreewindowslot(st);
+  if (slot >= 0) {
+    int arity;
+    long height, width, starty, startx;
+    ei_decode_tuple_header(st->args, &(st->index), &arity);
+    ei_decode_long(st->args, &(st->index), &height);
+    ei_decode_long(st->args, &(st->index), &width);
+    ei_decode_long(st->args, &(st->index), &starty);
+    ei_decode_long(st->args, &(st->index), &startx);
+    st->win[slot] = newwin(height, width, starty, startx);
+    integer(&(st->eixb), slot);
+  } else {
+    integer(&(st->eixb), -1);
+  }
+}
+
+void do_delwin(state *st) {
+  long slot;
+  ei_decode_long(st->args, &(st->index), &slot);
+  if (st->win[slot] == NULL) {
+    boolean(st, FALSE);
+  } else if (st->win[slot] != NULL) {
+    delwin(st->win[slot]);
+    st->win[slot] = NULL;
+    boolean(st, TRUE);
+  }
+}
+
+void do_wmove(state *st) {
+  int arity;
+  long slot, y, x;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);
+  ei_decode_long(st->args, &(st->index), &y);
+  ei_decode_long(st->args, &(st->index), &x);
+  encode_ok_reply(st, wmove(st->win[slot], (int)y, (int)x));
+}
+
+void do_waddstr(state *st) {
+  int arity;
+  long slot, strlen;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);
+  ei_decode_long(st->args, &(st->index), &strlen);
+  char str[strlen];
+  ei_decode_string(st->args, &(st->index), str);
+  encode_ok_reply(st, waddnstr(st->win[slot], str, strlen));
+}
+
+void do_waddch(state *st) {
+  int arity;
+  long slot;
+  char ch = 0;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);
+  ei_decode_char(st->args, &(st->index), &ch);
+  encode_ok_reply(st, waddch(st->win[slot], ch));
+}
+
+void do_mvwaddstr(state *st) {
+  int arity;
+  long slot, y, x, strlen;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot); 
+  ei_decode_long(st->args, &(st->index), &y);
+  ei_decode_long(st->args, &(st->index), &x);
+  ei_decode_long(st->args, &(st->index), &strlen);
+  char str[strlen];
+  ei_decode_string(st->args, &(st->index), str);
+  encode_ok_reply(st, mvwaddnstr(st->win[slot], (int)y, (int)x, str, strlen));
+}
+
+void do_mvwaddch(state *st) {
+  int arity;
+  long slot, y, x;
+  char ch = 0;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);
+  ei_decode_long(st->args, &(st->index), &y);
+  ei_decode_long(st->args, &(st->index), &x);
+  ei_decode_char(st->args, &(st->index), &ch);
+  encode_ok_reply(st, mvwaddch(st->win[slot], (int)y, (int)x, ch));
+}
+
+void do_wrefresh(state *st) {
+  long slot;
+  ei_decode_long(st->args, &(st->index), &slot);
+  encode_ok_reply(st, wrefresh(st->win[slot]));
+}
 
 // =============================================================================
 // Utility functions
@@ -352,6 +462,13 @@ void encode_ok_reply(state *st, int code) {
   } else {
     error(st, code);
   }
+}
+
+int findfreewindowslot(state *st) {
+  int i;
+  for (i = 0; i < _MAXWINDOWS; i++)
+    if (st->win[i] == NULL) return i;
+  return -1;
 }
 
 // =============================================================================

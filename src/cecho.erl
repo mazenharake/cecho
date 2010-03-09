@@ -37,7 +37,8 @@
 -export([refresh/0, cbreak/0, nocbreak/0, echo/0, noecho/0, addch/1, addstr/1,
 	 move/2, getyx/0, getmaxyx/0, curs_set/1, erase/0, has_colors/0,
 	 start_color/0, init_pair/3, attron/1, attroff/1, nl/0, nonl/0,
-	 scrollok/1, mvaddch/3, mvaddstr/3]).
+	 scrollok/1, mvaddch/3, mvaddstr/3, newwin/4, delwin/1, wmove/3, 
+	 waddstr/2, waddch/2, mvwaddstr/4, mvwaddch/4, wrefresh/1]).
 
 %% =============================================================================
 %% Application API
@@ -113,6 +114,41 @@ mvaddstr(Y, X, String) when is_list(String) andalso is_integer(X) andalso
     Str = lists:flatten(String),
     call(?MVADDSTR, {Y, X, erlang:iolist_size(Str), Str}).
 
+newwin(Height, Width, StartY, StartX) when is_integer(Height) andalso 
+					   is_integer(Width) andalso 
+					   is_integer(StartY) andalso
+					   is_integer(StartX) ->
+    call(?NEWWIN, {Height, Width, StartY, StartX}).
+
+delwin(Window) when is_integer(Window) ->
+    call(?DELWIN, Window).
+
+wmove(Window, Y, X) when is_integer(Window) andalso is_integer(Y) andalso 
+			 is_integer(X) ->
+    call(?WMOVE, {Window, Y, X}).
+
+waddstr(Window, String) when is_integer(Window) andalso is_list(String) ->
+    Str = lists:flatten(String),
+    call(?WADDSTR, {Window, erlang:iolist_size(Str), Str}).
+
+waddch(Window, Char) when is_integer(Window) andalso is_integer(Char) andalso 
+                          Char >= 0 andalso Char =< 255  ->
+    call(?WADDCH, {Window, Char}).
+
+mvwaddstr(Window, Y, X, String) when is_integer(Window) andalso is_integer(Y)
+				     andalso is_integer(X) andalso 
+				     is_list(String) ->
+    Str = lists:flatten(String),
+    call(?MVWADDSTR, {Window, Y, X, erlang:iolist_size(Str), Str}).
+
+mvwaddch(Window, Y, X, Char) when is_integer(Window) andalso is_integer(Y)
+                                  andalso is_integer(X) andalso 
+                                  Char >= 0 andalso Char =< 255  ->
+    call(?MVWADDCH, {Window, Y, X, Char}).
+
+wrefresh(Window) when is_integer(Window) ->
+    call(?WREFRESH, Window).
+    
 %% =============================================================================
 %% Behaviour Callbacks
 %% =============================================================================

@@ -26,3 +26,5 @@
 // POSSIBILITY OF SUCH DAMAGE.x 
 
 #define _INT(A1,A2,A3,A4) ((int)(A1) << 24 | (A2) << 16 | (A3) << 8 | (A4))
+
+#define _MAXWINDOWS 20 

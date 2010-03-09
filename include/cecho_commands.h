@@ -49,3 +49,11 @@
 #define SCROLLOK 21
 #define MVADDCH 22
 #define MVADDSTR 23
+#define NEWWIN 24
+#define DELWIN 25
+#define WMOVE 26
+#define WADDSTR 27
+#define WADDCH 28
+#define MVWADDSTR 29
+#define MVWADDCH 30
+#define WREFRESH 31
