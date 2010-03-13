@@ -49,7 +49,7 @@ typedef struct {
 
 void init_state(state *st, char *args, int argslen);
 void ok(state *st);
-void error(state *st, int code);
+void error_tuple(state *st, int code);
 void boolean(state *st, int code);
 
 void tuple(ei_x_buff *eixb, int size);
@@ -430,7 +430,7 @@ void ok(state *st) {
   atom(&(st->eixb), "ok", 2);
 }
 
-void error(state *st, int code) {
+void error_tuple(state *st, int code) {
   tuple(&(st->eixb), 2);
   atom(&(st->eixb), "error", 5);
   integer(&(st->eixb), code);
@@ -463,7 +463,7 @@ void encode_ok_reply(state *st, int code) {
   if (code == OK) {
     ok(st);
   } else {
-    error(st, code);
+    error_tuple(st, code);
   }
 }
 
