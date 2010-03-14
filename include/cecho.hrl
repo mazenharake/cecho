@@ -45,5 +45,7 @@
 -define(ceCOLOR_PAIR(C), (C bsl 8)).
 -define(ceA_BOLD, (1 bsl (8 + 13))).
 -define(ceA_UNDERLINE, (1 bsl (8 + 9))).
+-define(ceA_REVERSE, (1 bsl (8 + 10))).
+-define(ceA_BLINK, (1 bsl (8 + 11))).
 
 -define(ceSTDSCR, 0).
