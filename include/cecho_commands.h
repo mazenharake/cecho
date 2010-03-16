@@ -57,3 +57,5 @@
 #define MVWADDSTR 29
 #define MVWADDCH 30
 #define WREFRESH 31
+#define WHLINE 32
+#define WVLINE 33

@@ -38,7 +38,8 @@
 	 move/2, getyx/0, getmaxyx/0, curs_set/1, erase/0, has_colors/0,
 	 start_color/0, init_pair/3, attron/1, attroff/1, nl/0, nonl/0,
 	 scrollok/2, mvaddch/3, mvaddstr/3, newwin/4, delwin/1, wmove/3, 
-	 waddstr/2, waddch/2, mvwaddstr/4, mvwaddch/4, wrefresh/1]).
+	 waddstr/2, waddch/2, mvwaddstr/4, mvwaddch/4, wrefresh/1, hline/2,
+	 whline/3, vline/2, wvline/3]).
 
 %% =============================================================================
 %% Application API
@@ -148,6 +149,22 @@ mvwaddch(Window, Y, X, Char) when is_integer(Window) andalso is_integer(Y)
 
 wrefresh(Window) when is_integer(Window) ->
     call(?WREFRESH, Window).
+
+hline(Char, MaxN) ->
+    whline(?ceSTDSCR, Char, MaxN).
+
+%% Ignore char-check on purpose because some macros that can be used will
+%% be outside the bounds of normal characters
+whline(Window, Char, MaxN) when is_integer(Window) andalso is_integer(MaxN) ->
+    call(?WHLINE, {Window, Char, MaxN}).
+
+vline(Char, MaxN) ->
+    wvline(?ceSTDSCR, Char, MaxN).
+
+%% Ignore char-check on purpose because some macros that can be used will
+%% be outside the bounds of normal characters
+wvline(Window, Char, MaxN) when is_integer(Window) andalso is_integer(MaxN) ->
+    call(?WVLINE, {Window, Char, MaxN}).
     
 %% =============================================================================
 %% Behaviour Callbacks
