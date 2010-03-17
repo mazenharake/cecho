@@ -49,3 +49,37 @@
 -define(ceA_BLINK, (1 bsl (8 + 11))).
 
 -define(ceSTDSCR, 0).
+
+-define(ceACS_DIAMOND, 4194400).
+-define(ceACS_CKBOARD, 4194401).
+-define(ceACS_DEGREE, 4194406).
+-define(ceACS_PLMINUS, 4194407).
+-define(ceACS_BOARD, 4194408).
+-define(ceACS_LANTERN, 4194409).
+-define(ceACS_LRCORNER, 4194410).
+-define(ceACS_URCORNER, 4194411).
+-define(ceACS_ULCORNER, 4194412).
+-define(ceACS_LLCORNER, 4194413).
+-define(ceACS_PLUS, 4194414).
+-define(ceACS_S1, 4194415).
+-define(ceACS_S3, 4194416).
+-define(ceACS_HLINE, 4194417).
+-define(ceACS_S7, 4194418).
+-define(ceACS_S9, 4194419).
+-define(ceACS_LTEE, 4194420).
+-define(ceACS_RTEE, 4194421).
+-define(ceACS_BTEE, 4194422).
+-define(ceACS_TTEE, 4194423).
+-define(ceACS_VLINE, 4194424).
+-define(ceACS_LEQUAL, 4194425).
+-define(ceACS_GEQUAL, 4194426).
+-define(ceACS_PI, 4194427).
+-define(ceACS_NEQUAL, 4194428).
+-define(ceACS_STERLING, 4194429).
+-define(ceACS_BULLET, 4194430).
+-define(ceACS_RARROW, 4194347).
+-define(ceACS_LARROW, 4194348).
+-define(ceACS_UARROW, 4194349).
+-define(ceACS_DARROW, 4194350).
+-define(ceACS_BLOCK, 4194352).
+
