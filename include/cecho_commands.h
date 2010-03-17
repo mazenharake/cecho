@@ -59,3 +59,4 @@
 #define WREFRESH 31
 #define WHLINE 32
 #define WVLINE 33
+#define WBORDER 34

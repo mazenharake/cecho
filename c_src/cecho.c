@@ -95,6 +95,7 @@ void do_mvwaddch(state *st);
 void do_wrefresh(state *st);
 void do_whline(state *st);
 void do_wvline(state *st);
+void do_wborder(state *st);
 
 // =============================================================================
 // Erlang Callbacks
@@ -153,6 +154,7 @@ static int ctrl(ErlDrvData drvstate, unsigned int command, char *args,
   case WREFRESH: do_wrefresh(st); break;
   case WHLINE: do_whline(st); break;
   case WVLINE: do_wvline(st); break;
+  case WBORDER: do_wborder(st); break;
   default: break;
   }
   
@@ -434,9 +436,27 @@ void do_wvline(state *st) {
   encode_ok_reply(st, wvline(st->win[slot], (chtype)ch, (int)max));
 }
 
+void do_wborder(state *st) {
+  int arity;
+  long slot, ls, rs, ts, bs, tl, tr, bl, br;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);
+  ei_decode_long(st->args, &(st->index), &ls);
+  ei_decode_long(st->args, &(st->index), &rs);
+  ei_decode_long(st->args, &(st->index), &ts);
+  ei_decode_long(st->args, &(st->index), &bs);
+  ei_decode_long(st->args, &(st->index), &tl);
+  ei_decode_long(st->args, &(st->index), &tr);
+  ei_decode_long(st->args, &(st->index), &bl);
+  ei_decode_long(st->args, &(st->index), &br);
+  encode_ok_reply(st, wborder(st->win[slot], (chtype)ls, (chtype)rs, (chtype)ts,
+			      (chtype)bs, (chtype)tl, (chtype)tr, (chtype)bl,
+			      (chtype)br));
+}
+
 // =============================================================================
 // Utility functions
-// ===========================================================================
+// =============================================================================
 void init_state(state *st, char *args, int argslen) {
   st->index = 0;
   st->version = 0;

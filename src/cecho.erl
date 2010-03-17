@@ -39,7 +39,7 @@
 	 start_color/0, init_pair/3, attron/1, attroff/1, nl/0, nonl/0,
 	 scrollok/2, mvaddch/3, mvaddstr/3, newwin/4, delwin/1, wmove/3, 
 	 waddstr/2, waddch/2, mvwaddstr/4, mvwaddch/4, wrefresh/1, hline/2,
-	 whline/3, vline/2, wvline/3]).
+	 whline/3, vline/2, wvline/3, border/8, wborder/9]).
 
 %% =============================================================================
 %% Application API
@@ -59,7 +59,7 @@ echo() ->
 noecho() -> 
     call(?NOECHO).
 
-addch(Char) when is_integer(Char) andalso Char >= 0 andalso Char =< 255 ->
+addch(Char) when is_integer(Char) ->
     call(?ADDCH, Char).
 
 addstr(String) when is_list(String) ->
@@ -106,8 +106,8 @@ nonl() ->
 scrollok(Window, BFlag) when is_integer(Window) andalso is_boolean(BFlag) ->
     call(?SCROLLOK, {Window, BFlag}).
 
-mvaddch(Y, X, Char) when is_integer(Char) andalso Char >= 0 andalso Char =< 255
-                         andalso is_integer(X) andalso is_integer(Y) ->
+mvaddch(Y, X, Char) when is_integer(Char) andalso is_integer(X) 
+			 andalso is_integer(Y) ->
     call(?MVADDCH, {Y, X, Char}).
 
 mvaddstr(Y, X, String) when is_list(String) andalso is_integer(X) andalso 
@@ -132,8 +132,7 @@ waddstr(Window, String) when is_integer(Window) andalso is_list(String) ->
     Str = lists:flatten(String),
     call(?WADDSTR, {Window, erlang:iolist_size(Str), Str}).
 
-waddch(Window, Char) when is_integer(Window) andalso is_integer(Char) andalso 
-                          Char >= 0 andalso Char =< 255  ->
+waddch(Window, Char) when is_integer(Window) andalso is_integer(Char) ->
     call(?WADDCH, {Window, Char}).
 
 mvwaddstr(Window, Y, X, String) when is_integer(Window) andalso is_integer(Y)
@@ -143,8 +142,7 @@ mvwaddstr(Window, Y, X, String) when is_integer(Window) andalso is_integer(Y)
     call(?MVWADDSTR, {Window, Y, X, erlang:iolist_size(Str), Str}).
 
 mvwaddch(Window, Y, X, Char) when is_integer(Window) andalso is_integer(Y)
-                                  andalso is_integer(X) andalso 
-                                  Char >= 0 andalso Char =< 255  ->
+                                  andalso is_integer(X) ->
     call(?MVWADDCH, {Window, Y, X, Char}).
 
 wrefresh(Window) when is_integer(Window) ->
@@ -153,19 +151,25 @@ wrefresh(Window) when is_integer(Window) ->
 hline(Char, MaxN) ->
     whline(?ceSTDSCR, Char, MaxN).
 
-%% Ignore char-check on purpose because some macros that can be used will
-%% be outside the bounds of normal characters
 whline(Window, Char, MaxN) when is_integer(Window) andalso is_integer(MaxN) ->
     call(?WHLINE, {Window, Char, MaxN}).
 
 vline(Char, MaxN) ->
     wvline(?ceSTDSCR, Char, MaxN).
 
-%% Ignore char-check on purpose because some macros that can be used will
-%% be outside the bounds of normal characters
 wvline(Window, Char, MaxN) when is_integer(Window) andalso is_integer(MaxN) ->
     call(?WVLINE, {Window, Char, MaxN}).
-    
+
+border(Ls, Rs, Ts, Bs, TLs, TRs, BLs, BRs) ->
+    wborder(0, Ls, Rs, Ts, Bs, TLs, TRs, BLs, BRs).
+
+wborder(Window, Ls, Rs, Ts, Bs, TLs, TRs, BLs, BRs) 
+  when is_integer(Ls) andalso is_integer(Rs) andalso 
+       is_integer(Ts) andalso is_integer(Bs) andalso 
+       is_integer(TLs) andalso is_integer(TRs) andalso 
+       is_integer(BLs) andalso is_integer(BRs) ->
+    call(?WBORDER, {Window, Ls, Rs, Ts, Bs, TLs, TRs, BLs, BRs}).
+
 %% =============================================================================
 %% Behaviour Callbacks
 %% =============================================================================
