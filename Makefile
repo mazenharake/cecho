@@ -2,6 +2,8 @@
 
 .PHONY: all clean
 
+UNAME       := $(shell uname)
+
 BEAMS       := $(patsubst src/%, ebin/%, $(patsubst %.erl, %.beam, $(wildcard src/*.erl)))
 ECINCLUDES  := -I include
 ECFLAGS     := +debug_info +strict_record_tests +netload
@@ -9,10 +11,23 @@ ECFLAGS     := +debug_info +strict_record_tests +netload
 EDEF        := include/cecho_commands.hrl
 CDEF        := $(patsubst %.hrl, %.h, $(EDEF))
 
-ERLDIR      := /home/mazen/lib/erlang/
+ERLDIR      := $(shell erl -noinput -eval 'io:format("~s",[code:root_dir()]),halt().')
+ERTSVERS    := $(shell erl -noinput -eval 'io:format("~s",[erlang:system_info(version)]),halt().')
+ERLINTRFCE  := $(shell erl -noinput -eval 'io:format("~s",[filename:basename(code:lib_dir(erl_interface))]),halt().')
 DRIVER      := priv/lib/cecho.so
-CFLAGS      := -g -Iinclude -I$(ERLDIR)/erts-5.7.4/include -I$(ERLDIR)/lib/erl_interface-3.6.4/include
-LDFLAGS     := -L$(ERLDIR)/lib/erl_interface-3.6.4/lib
+
+ifeq ($(UNAME),Linux)
+CFLAGS      := -fpic -shared
+endif
+ifeq ($(UNAME),Darwin)
+CFLAGS      := -bundle -flat_namespace -undefined suppress
+endif
+ifeq ($(UNAME),SunOS)
+CFLAGS      := -fpic -shared 
+endif
+CFLAGS      := $(CFLAGS) -Wall -g -Iinclude -I$(ERLDIR)/erts-$(ERTSVERS)/include \
+               -I$(ERLDIR)/lib/$(ERLINTRFCE)/include
+LDFLAGS     := -L$(ERLDIR)/lib/$(ERLINTRFCE)/lib
 
 all: $(EDEF) $(BEAMS) $(DRIVER)
 
@@ -26,7 +41,7 @@ ebin/%.beam: src/%.erl
 
 priv/lib/%.so: c_src/%.c
 	@echo "[GCC]" $<": "$@
-	@gcc -o $@ -Wall -fpic -shared $(CFLAGS) $(LDFLAGS) $<  -lerl_interface -lei -lncurses
+	@gcc -o $@ $(CFLAGS) $(LDFLAGS) $<  -lerl_interface -lei -lncurses
 
 clean:
 	rm -f ebin/*.beam
