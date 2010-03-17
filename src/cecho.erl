@@ -39,7 +39,7 @@
 	 start_color/0, init_pair/3, attron/1, attroff/1, nl/0, nonl/0,
 	 scrollok/2, mvaddch/3, mvaddstr/3, newwin/4, delwin/1, wmove/3, 
 	 waddstr/2, waddch/2, mvwaddstr/4, mvwaddch/4, wrefresh/1, hline/2,
-	 whline/3, vline/2, wvline/3, border/8, wborder/9]).
+	 whline/3, vline/2, wvline/3, border/8, wborder/9, box/3]).
 
 %% =============================================================================
 %% Application API
@@ -169,6 +169,10 @@ wborder(Window, Ls, Rs, Ts, Bs, TLs, TRs, BLs, BRs)
        is_integer(TLs) andalso is_integer(TRs) andalso 
        is_integer(BLs) andalso is_integer(BRs) ->
     call(?WBORDER, {Window, Ls, Rs, Ts, Bs, TLs, TRs, BLs, BRs}).
+
+box(Window, Vert, Horz) when is_integer(Window) andalso is_integer(Vert) andalso
+			     is_integer(Horz) ->
+    call(?BOX, {Window, Vert, Horz}).
 
 %% =============================================================================
 %% Behaviour Callbacks

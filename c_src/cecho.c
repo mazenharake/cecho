@@ -96,6 +96,7 @@ void do_wrefresh(state *st);
 void do_whline(state *st);
 void do_wvline(state *st);
 void do_wborder(state *st);
+void do_box(state *st);
 
 // =============================================================================
 // Erlang Callbacks
@@ -155,6 +156,7 @@ static int ctrl(ErlDrvData drvstate, unsigned int command, char *args,
   case WHLINE: do_whline(st); break;
   case WVLINE: do_wvline(st); break;
   case WBORDER: do_wborder(st); break;
+  case BOX: do_box(st); break;
   default: break;
   }
   
@@ -452,6 +454,16 @@ void do_wborder(state *st) {
   encode_ok_reply(st, wborder(st->win[slot], (chtype)ls, (chtype)rs, (chtype)ts,
 			      (chtype)bs, (chtype)tl, (chtype)tr, (chtype)bl,
 			      (chtype)br));
+}
+
+void do_box(state *st) {
+  int arity;
+  long slot, verch, horch;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);
+  ei_decode_long(st->args, &(st->index), &verch);
+  ei_decode_long(st->args, &(st->index), &horch);
+  encode_ok_reply(st, box(st->win[slot], (chtype)verch, (chtype)horch));
 }
 
 // =============================================================================
