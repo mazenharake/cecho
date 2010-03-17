@@ -93,6 +93,8 @@ void do_waddch(state *st);
 void do_mvwaddstr(state *st);
 void do_mvwaddch(state *st);
 void do_wrefresh(state *st);
+void do_whline(state *st);
+void do_wvline(state *st);
 
 // =============================================================================
 // Erlang Callbacks
@@ -149,6 +151,8 @@ static int ctrl(ErlDrvData drvstate, unsigned int command, char *args,
   case MVWADDSTR: do_mvwaddstr(st); break;
   case MVWADDCH: do_mvwaddch(st); break;
   case WREFRESH: do_wrefresh(st); break;
+  case WHLINE: do_whline(st); break;
+  case WVLINE: do_wvline(st); break;
   default: break;
   }
   
@@ -183,7 +187,6 @@ void do_refresh(state *st) {
 void do_cbreak(state *st) {
   encode_ok_reply(st, cbreak());
 }
-
 void do_nocbreak(state *st) {
   encode_ok_reply(st, nocbreak());
 }
@@ -197,9 +200,9 @@ void do_noecho(state *st) {
 }
 
 void do_addch(state *st) {
-  char ch = 0;
-  ei_decode_char(st->args, &(st->index), &ch);
-  encode_ok_reply(st, addch(ch));
+  long ch;
+  ei_decode_long(st->args, &(st->index), &ch);
+  encode_ok_reply(st, addch((chtype)ch));
 }
 
 void do_addstr(state *st) {
@@ -297,14 +300,13 @@ void do_scrollok(state *st) {
 }
 
 void do_mvaddch(state *st) {
-  char ch = 0;
   int arity;
-  long y, x;
+  long y, x, ch;
   ei_decode_tuple_header(st->args, &(st->index), &arity);
   ei_decode_long(st->args, &(st->index), &y);
   ei_decode_long(st->args, &(st->index), &x);
-  ei_decode_char(st->args, &(st->index), &ch);
-  encode_ok_reply(st, mvaddch((int)y, (int)x, ch));
+  ei_decode_long(st->args, &(st->index), &ch);
+  encode_ok_reply(st, mvaddch((int)y, (int)x, (chtype)ch));
 }
 
 void do_mvaddstr(state *st) {
@@ -410,6 +412,26 @@ void do_wrefresh(state *st) {
   long slot;
   ei_decode_long(st->args, &(st->index), &slot);
   encode_ok_reply(st, wrefresh(st->win[slot]));
+}
+
+void do_whline(state *st) {
+  int arity;
+  long slot, ch, max;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);
+  ei_decode_long(st->args, &(st->index), &ch);
+  ei_decode_long(st->args, &(st->index), &max);
+  encode_ok_reply(st, whline(st->win[slot], (chtype)ch, (int)max));
+}
+
+void do_wvline(state *st) {
+  int arity;
+  long slot, ch, max;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);
+  ei_decode_long(st->args, &(st->index), &ch);
+  ei_decode_long(st->args, &(st->index), &max);
+  encode_ok_reply(st, wvline(st->win[slot], (chtype)ch, (int)max));
 }
 
 // =============================================================================
