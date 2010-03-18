@@ -229,16 +229,20 @@ void do_move(state *st) {
 }
 
 void do_getyx(state *st) {
+  long slot;
   int x, y;
-  getyx(st->win[0], y, x);
+  ei_decode_long(st->args, &(st->index), &slot);
+  getyx(st->win[slot], y, x);
   tuple(&(st->eixb), 2);
   integer(&(st->eixb), y);
   integer(&(st->eixb), x);
 }
 
 void do_getmaxyx(state *st) {
+  long slot;
   int x, y;
-  getmaxyx(st->win[0], y, x);
+  ei_decode_long(st->args, &(st->index), &slot);
+  getmaxyx(st->win[slot], y, x);
   tuple(&(st->eixb), 2);
   integer(&(st->eixb), y);
   integer(&(st->eixb), x);

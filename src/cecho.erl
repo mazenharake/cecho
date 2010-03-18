@@ -34,12 +34,14 @@
 -export([start/2, stop/1]).
 
 %% Application API
+
 -export([refresh/0, cbreak/0, nocbreak/0, echo/0, noecho/0, addch/1, addstr/1,
 	 move/2, getyx/0, getmaxyx/0, curs_set/1, erase/0, has_colors/0,
 	 start_color/0, init_pair/3, attron/1, attroff/1, nl/0, nonl/0,
-	 scrollok/2, mvaddch/3, mvaddstr/3, newwin/4, delwin/1, wmove/3, 
+	 scrollok/2, mvaddch/3, mvaddstr/3, newwin/4, delwin/1, wmove/3,
 	 waddstr/2, waddch/2, mvwaddstr/4, mvwaddch/4, wrefresh/1, hline/2,
-	 whline/3, vline/2, wvline/3, border/8, wborder/9, box/3]).
+	 whline/3, vline/2, wvline/3, border/8, wborder/9, box/3, getyx/1,
+	 getmaxyx/1]).
 
 %% =============================================================================
 %% Application API
@@ -70,10 +72,16 @@ move(Y, X) when is_integer(X) andalso is_integer(Y) ->
     call(?MOVE, {Y, X}).
 
 getyx() ->
-    call(?GETYX).
+    getyx(?ceSTDSCR).
+
+getyx(Window) when is_integer(Window) ->
+    call(?GETYX, Window).
 
 getmaxyx() ->
-    call(?GETMAXYX).
+    getmaxyx(?ceSTDSCR).
+
+getmaxyx(Window) when is_integer(Window) ->
+    call(?GETMAXYX, Window).
 
 curs_set(Flag) when is_integer(Flag) ->
     call(?CURS_SET, Flag).
