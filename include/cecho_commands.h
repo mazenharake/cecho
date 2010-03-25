@@ -42,8 +42,8 @@
 #define HAS_COLORS 14
 #define START_COLOR 15
 #define INIT_PAIR 16
-#define ATTRON 17
-#define ATTROFF 18
+#define WATTRON 17
+#define WATTROFF 18
 #define NL 19
 #define NONL 20
 #define SCROLLOK 21

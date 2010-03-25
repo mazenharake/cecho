@@ -78,8 +78,8 @@ void do_start_color(state *st);
 void do_init_pair(state *st);
 void do_curs_set(state *st);
 void do_init_pair(state *st);
-void do_attron(state *st);
-void do_attroff(state *st);
+void do_wattron(state *st);
+void do_wattroff(state *st);
 void do_nl(state *st);
 void do_nonl(state *st);
 void do_scrollok(state *st);
@@ -139,8 +139,8 @@ static int ctrl(ErlDrvData drvstate, unsigned int command, char *args,
   case HAS_COLORS: do_has_colors(st); break;
   case START_COLOR: do_start_color(st); break;
   case INIT_PAIR: do_init_pair(st); break;
-  case ATTRON: do_attron(st); break;
-  case ATTROFF: do_attroff(st); break;
+  case WATTRON: do_wattron(st); break;
+  case WATTROFF: do_wattroff(st); break;
   case NL: do_nl(st); break;
   case NONL: do_nonl(st); break;
   case SCROLLOK: do_scrollok(st); break;
@@ -231,16 +231,20 @@ void do_move(state *st) {
 }
 
 void do_getyx(state *st) {
+  long slot;
   int x, y;
-  getyx(st->win[0], y, x);
+  ei_decode_long(st->args, &(st->index), &slot);
+  getyx(st->win[slot], y, x);
   tuple(&(st->eixb), 2);
   integer(&(st->eixb), y);
   integer(&(st->eixb), x);
 }
 
 void do_getmaxyx(state *st) {
+  long slot;
   int x, y;
-  getmaxyx(st->win[0], y, x);
+  ei_decode_long(st->args, &(st->index), &slot);
+  getmaxyx(st->win[slot], y, x);
   tuple(&(st->eixb), 2);
   integer(&(st->eixb), y);
   integer(&(st->eixb), x);
@@ -275,16 +279,22 @@ void do_init_pair(state *st) {
   encode_ok_reply(st, init_pair((int)pairnum, (int)fcolor, (int)bcolor));
 }
 
-void do_attron(state *st) {
-  long attrs;
+void do_wattron(state *st) {
+  int arity;
+  long slot, attrs;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);  
   ei_decode_long(st->args, &(st->index), &attrs);
-  encode_ok_reply(st, attron((int)attrs));
+  encode_ok_reply(st, wattron(st->win[slot], (int)attrs));
 }
 
-void do_attroff(state *st) {
-  long attrs;
+void do_wattroff(state *st) {
+  int arity;
+  long slot, attrs;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);
   ei_decode_long(st->args, &(st->index), &attrs);
-  encode_ok_reply(st, attroff((int)attrs));
+  encode_ok_reply(st, wattroff(st->win[slot], (int)attrs));
 }
 
 void do_nl(state *st) {
