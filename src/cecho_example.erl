@@ -174,13 +174,14 @@ input() ->
     ok = cecho:cbreak(),
     ok = cecho:noecho(),
     ok = cecho:curs_set(?ceCURS_INVISIBLE),
+    ok = cecho:keypad(?ceSTDSCR, true),
     spawn_link(?MODULE, input_counter, [0]),
     cecho:mvaddstr(9, 10, "Enter:    "),
     cecho:refresh(),
     input_reader().
 
 input_reader() ->
-    [P] = io:get_chars('',1),
+    P = cecho:getch(),
     case P of
 	113 ->
 	    application:stop(cecho);

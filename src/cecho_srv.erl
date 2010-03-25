@@ -35,10 +35,10 @@
 	 code_change/3]).
 
 %% Module API
--export([start_link/0, call/2 ]).
+-export([start_link/0, call/2, getch/0]).
 
 %% Records
--record(state, { port }).
+-record(state, { port, getpid }).
 
 %% =============================================================================
 %% Module API
@@ -49,6 +49,13 @@ start_link() ->
 call(Cmd, Args) ->
     gen_server:call(?MODULE, {call, Cmd, Args}, infinity).
 
+getch() ->
+    ?MODULE ! {getch, self()},
+    receive 
+	{ch, Chr} ->
+	    Chr
+    end.
+
 %% =============================================================================
 %% Behaviour Callbacks
 %% =============================================================================
@@ -56,10 +63,11 @@ init(no_args) ->
     process_flag(trap_exit, true),
     case erl_ddll:load(code:priv_dir(cecho)++"/lib","cecho") of
 	ok ->
-	    Port = erlang:open_port({spawn, "cecho"}, []),
+	    Port = erlang:open_port({spawn, "cecho"}, [binary]),
 	    ok = do_call(Port, ?INITSCR),
 	    ok = do_call(Port, ?ERASE),
 	    ok = do_call(Port, ?REFRESH),
+	    erlang:port_command(Port, <<>>),
 	    {ok, #state{ port = Port }};
 	{error, ErrorCode} ->
 	    exit({driver_error, erl_ddll:format_error(ErrorCode)})
@@ -75,12 +83,20 @@ terminate(_Reason, State) ->
     erlang:port_close(State#state.port),
     erl_ddll:unload("cecho").
 
-%% @hidden
-handle_cast(_, State) ->
-    {noreply, State}.
+handle_info({getch, From}, #state{ getpid = undefined } = State) ->
+    {noreply, State#state{ getpid = From }};
+handle_info({getch, From}, State) ->
+    exit(From, kill),
+    {noreply, State};
+handle_info({_Port, {data, _Binary}}, #state{ getpid = undefined } = State) ->
+    {noreply, State};
+handle_info({_Port, {data, Binary}}, State) ->
+    Ch = binary_to_term(Binary),
+    State#state.getpid ! {ch, Ch},
+    {noreply, State#state{ getpid = undefined }}.
 
 %% @hidden
-handle_info(_, State) ->
+handle_cast(_, State) ->
     {noreply, State}.
 
 %% @hidden

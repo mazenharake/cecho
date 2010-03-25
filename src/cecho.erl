@@ -41,7 +41,7 @@
 	 scrollok/2, mvaddch/3, mvaddstr/3, newwin/4, delwin/1, wmove/3,
 	 waddstr/2, waddch/2, mvwaddstr/4, mvwaddch/4, wrefresh/1, hline/2,
 	 whline/3, vline/2, wvline/3, border/8, wborder/9, box/3, getyx/1,
-	 getmaxyx/1, attron/2, attroff/2, keypad/2]).
+	 getmaxyx/1, attron/2, attroff/2, keypad/2, getch/0]).
 
 %% =============================================================================
 %% Application API
@@ -190,6 +190,9 @@ box(Window, Vert, Horz) when is_integer(Window) andalso is_integer(Vert) andalso
 
 keypad(Window, BFlag) when is_integer(Window) andalso is_boolean(BFlag) ->
     call(?KEYPAD, {Window, BFlag}).
+
+getch() ->
+    cecho_srv:getch().
 
 %% =============================================================================
 %% Behaviour Callbacks
