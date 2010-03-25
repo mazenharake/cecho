@@ -97,6 +97,7 @@ void do_whline(state *st);
 void do_wvline(state *st);
 void do_wborder(state *st);
 void do_box(state *st);
+void do_keypad(state *st);
 
 // =============================================================================
 // Erlang Callbacks
@@ -157,6 +158,7 @@ static int ctrl(ErlDrvData drvstate, unsigned int command, char *args,
   case WVLINE: do_wvline(st); break;
   case WBORDER: do_wborder(st); break;
   case BOX: do_box(st); break;
+  case KEYPAD: do_keypad(st); break;
   default: break;
   }
   
@@ -464,6 +466,15 @@ void do_box(state *st) {
   ei_decode_long(st->args, &(st->index), &verch);
   ei_decode_long(st->args, &(st->index), &horch);
   encode_ok_reply(st, box(st->win[slot], (chtype)verch, (chtype)horch));
+}
+
+void do_keypad(state *st) {
+  int arity, bf;
+  long slot;
+  ei_decode_tuple_header(st->args, &(st->index), &arity);
+  ei_decode_long(st->args, &(st->index), &slot);
+  ei_decode_boolean(st->args, &(st->index), &bf);
+  encode_ok_reply(st, keypad(st->win[slot], bf));
 }
 
 // =============================================================================
