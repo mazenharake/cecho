@@ -6,7 +6,7 @@
 %%
 %% Simple countdown which shows how to print, move and get coordinates
 %%
-countdown(S) ->
+countdown() ->
     application:start(cecho),
     cecho:cbreak(),
     cecho:noecho(),
@@ -18,7 +18,7 @@ countdown(S) ->
     cecho:move(10, 10),
     cecho:addstr("Countdown: "),
     cecho:refresh(),
-    count_it_down(S),
+    count_it_down(10),
     cecho:curs_set(?ceCURS_NORMAL),
     timer:sleep(2000),
     application:stop(cecho).
@@ -99,14 +99,6 @@ colors() ->
     ok = cecho:noecho(),
     ok = cecho:curs_set(?ceCURS_INVISIBLE),
     ok = cecho:start_color(),
-    %% ok = cecho:init_pair(1, ?ceCOLOR_RED, ?ceCOLOR_BLACK),
-    %% ok = cecho:init_pair(2, ?ceCOLOR_GREEN, ?ceCOLOR_BLACK),
-    %% ok = cecho:init_pair(3, ?ceCOLOR_YELLOW, ?ceCOLOR_BLACK),
-    %% ok = cecho:init_pair(4, ?ceCOLOR_BLUE, ?ceCOLOR_BLACK),
-    %% ok = cecho:init_pair(5, ?ceCOLOR_MAGENTA, ?ceCOLOR_BLACK),
-    %% ok = cecho:init_pair(6, ?ceCOLOR_CYAN, ?ceCOLOR_BLACK),
-    %% ok = cecho:init_pair(7, ?ceCOLOR_WHITE, ?ceCOLOR_BLACK),
-    %% ok = cecho:init_pair(8, ?ceCOLOR_BLACK, ?ceCOLOR_BLACK),
     ok = cecho:init_pair(1, ?ceCOLOR_BLACK, ?ceCOLOR_RED),
     ok = cecho:init_pair(2, ?ceCOLOR_BLACK, ?ceCOLOR_GREEN),
     ok = cecho:init_pair(3, ?ceCOLOR_BLACK, ?ceCOLOR_YELLOW),
@@ -119,20 +111,18 @@ colors() ->
     random:seed(A, B, C),
     {MaxRow, MaxCol} = cecho:getmaxyx(),
     cecho:move(10,10),
-    cecho:addstr(lists:flatten(io_lib:format("Max Row: ~p, Max Col: ~p",[MaxRow, MaxCol]))),
+    cecho:addstr(io_lib:format("Max Row: ~p, Max Col: ~p",[MaxRow, MaxCol])),
     cecho:move(0, 0),
     cecho:addch($@),
     cecho:move(MaxRow-1, 0),
     cecho:addch($@),
     cecho:move(0, MaxCol-1),
     cecho:addch($@),
-    %% -2 on next row because we can't write in last row and col becase we will segfault
-    %% don't know why yet :( probably because of a scrolling/newline issue somewhere.
-    cecho:move(MaxRow-2, MaxCol-1),
+    cecho:move(MaxRow-1, MaxCol-1),
     cecho:addch($@),
     cecho:refresh(),
     timer:sleep(2000),
-    do_colors(MaxRow-1, MaxCol, 2000),
+    do_colors(MaxRow, MaxCol, 2000),
     application:stop(cecho).
 
 do_colors(_,_,0) -> ok;
@@ -183,8 +173,10 @@ input() ->
 input_reader() ->
     P = cecho:getch(),
     case P of
-	113 ->
+	$q ->
 	    application:stop(cecho);
+	?ceKEY_F(1) -> 
+	    halt();
 	_ ->
 	    cecho:mvaddstr(9, 17, io_lib:format("~p  ",[P])),
 	    cecho:refresh(),
@@ -206,24 +198,25 @@ cursmove() ->
     cecho:cbreak(),
     cecho:noecho(),
     cecho:curs_set(?ceCURS_INVISIBLE),
+    cecho:keypad(?ceSTDSCR, true),
     cecho:mvaddch(10, 10, $@),
     cecho:move(10,10),
     cecho:refresh(),
-%    upd_pos(),
-    moveloop().
-
-moveloop() ->
-    [C] = io:get_chars("",1),
+    moveloop(cecho:getch()).
+moveloop(K) when K == ?ceKEY_F(1) ->
+    halt();
+moveloop(?ceKEY_ESC) ->
+    application:stop(cecho);
+moveloop(C) ->
     case C of
-	$q -> application:stop(cecho);
-	65 -> mv(-1, 0); %% Up
-	66 -> mv(1, 0); %% Down
-	67 -> mv(0, 1); %% Right
-	68 -> mv(0, -1); %% Left
-	C -> ok
+	?ceKEY_UP -> mv(-1, 0);
+	?ceKEY_DOWN -> mv(1, 0);
+	?ceKEY_RIGHT -> mv(0, 1);
+	?ceKEY_LEFT -> mv(0, -1);
+	_ -> ok
     end,
     cecho:refresh(),
-    moveloop().
+    moveloop(cecho:getch()).
 
 mv(OffsetY, OffsetX) ->
     {CY, CX} = cecho:getyx(),

@@ -83,3 +83,20 @@
 -define(ceACS_DARROW, 4194350).
 -define(ceACS_BLOCK, 4194352).
 
+-define(ceKEY_TAB, 9).
+-define(ceKEY_ESC, 27).
+
+
+-define(ceKEY_DOWN, 258).
+-define(ceKEY_UP, 259).
+-define(ceKEY_LEFT, 260).
+-define(ceKEY_RIGHT, 261).
+-define(ceKEY_HOME, 262).
+-define(ceKEY_F(N), 264+N).
+-define(ceKEY_DEL, 330).
+-define(ceKEY_INS, 331).
+-define(ceKEY_PGDOWN, 338).
+-define(ceKEY_PGUP, 339).
+-define(ceKEY_END, 360).
+
+
