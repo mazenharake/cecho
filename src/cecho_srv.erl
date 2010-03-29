@@ -38,7 +38,7 @@
 -export([start_link/0, call/2, getch/0]).
 
 %% Records
--record(state, { port, getpid }).
+-record(state, { port, getch }).
 
 %% =============================================================================
 %% Module API
@@ -50,11 +50,7 @@ call(Cmd, Args) ->
     gen_server:call(?MODULE, {call, Cmd, Args}, infinity).
 
 getch() ->
-    ?MODULE ! {getch, self()},
-    receive 
-	{ch, Chr} ->
-	    Chr
-    end.
+    gen_server:call(?MODULE, getch, infinity).
 
 %% =============================================================================
 %% Behaviour Callbacks
@@ -74,8 +70,11 @@ init(no_args) ->
     end.
 
 handle_call({call, Cmd, Args}, _From, State) ->
-    Response = do_call(State#state.port, Cmd, Args),
-    {reply, Response, State}.
+    {reply, do_call(State#state.port, Cmd, Args), State};
+handle_call(getch, From, #state{ getch = undefined } = State) ->
+    {noreply, State#state{ getch = From }};
+handle_call(getch, _From, State) ->
+    {reply, -1, State}.
 
 terminate(_Reason, State) ->
     do_call(State#state.port, ?ENDWIN),
@@ -83,17 +82,11 @@ terminate(_Reason, State) ->
     erlang:port_close(State#state.port),
     erl_ddll:unload("cecho").
 
-handle_info({getch, From}, #state{ getpid = undefined } = State) ->
-    {noreply, State#state{ getpid = From }};
-handle_info({getch, From}, State) ->
-    exit(From, kill),
-    {noreply, State};
-handle_info({_Port, {data, _Binary}}, #state{ getpid = undefined } = State) ->
+handle_info({_Port, {data, _Binary}}, #state{ getch = undefined } = State) ->
     {noreply, State};
 handle_info({_Port, {data, Binary}}, State) ->
-    Ch = binary_to_term(Binary),
-    State#state.getpid ! {ch, Ch},
-    {noreply, State#state{ getpid = undefined }}.
+    gen_server:reply(State#state.getch, binary_to_term(Binary)),
+    {noreply, State#state{ getch = undefined }}.
 
 %% @hidden
 handle_cast(_, State) ->
