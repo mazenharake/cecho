@@ -2,14 +2,18 @@
                    Cecho - An ncurses library for Erlang
 ================================================================================
 
-This README file sucks because there is virtually nothing here. Please find the 
-github page on: 
-    http://www.github.com/mazenharake/cecho
+Cecho is an ncurses library for Erlang which enabled Erlang applications to
+create terminal based GUIs. It aims to have an API as close as possible to the
+original API of ncurses so that a person familiar with ncurses API should be 
+able to immediately use it without any introduction.
 
 == Contact ==
-blog: http://mazenharake.wordpress.com
-IRC: #erlang on freenode
-ML: www.erlang.org/faq.html
+For feedback, comments and/or suggestions
+
+Project: http://www.github.com/mazenharake/cecho
+Blog: http://mazenharake.wordpress.com
+IRC: #erlang @ freenode
+MailingList: http://www.erlang.org/faq.html
 
 == License ==
 Copyright (c) 2010, Mazen Harake
@@ -139,7 +143,8 @@ There are several ways to run the examples and own scripts/app with cecho.
 There are essentially two _intended_ ways which are recommend; either running 
 the whole thing as a script or from a module using the '-eval' flag to erl.
 
-Examples on how to run the helloworld example (compile first):
+Examples on how to run the helloworld example (make sure you have compiled cecho
+first):
 
 From the cecho directory do:
 $> erl -noinput -pa ../cecho/ebin/ -eval 'cecho_example:helloworld()' +A 50
@@ -153,7 +158,7 @@ Or create an escript file as follows:
 main(_) -> cecho_example:helloworld().
 === /Code ===
 
-and save it, make it executable and run it from the cecho directory:
+and save it, then make it executable and run it from the cecho directory:
 $> chmod +x ./helloworld.escript
 $> ./helloworld.escript
 
@@ -161,7 +166,7 @@ IMPORTANT:
 If input will be used (cecho:getch/0) then the two flags '-noinput' and +A <N>
 _must_ be used. The reason is that if '-noinput' is not specified the erlang VM
 will interfere with the reading of the keys. The second reason is that in order
-to asynchronously read the input Erlang need more io thread; however it doesn't
+to asynchronously read the input Erlang need more io threads; however it doesn't
 seem to be enough to specify e.g. 10 in some cases and the reason is not known.
 If a "high enough number" is specified then the input will work very well.
 
