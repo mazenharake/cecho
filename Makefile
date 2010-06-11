@@ -11,7 +11,7 @@ ECFLAGS     := +debug_info +strict_record_tests +netload
 ERLDIR      := $(shell erl -noinput -eval 'io:format("~s",[code:root_dir()]),halt().')
 ERTSVERS    := $(shell erl -noinput -eval 'io:format("~s",[erlang:system_info(version)]),halt().')
 ERLINTRFCE  := $(shell erl -noinput -eval 'io:format("~s",[filename:basename(code:lib_dir(erl_interface))]),halt().')
-DRIVER      := priv/lib/cecho.so
+DRIVER      := priv/cecho.so
 
 ifeq ($(UNAME),Linux)
 CFLAGS      := -fpic -shared
@@ -32,11 +32,11 @@ ebin/%.beam: src/%.erl
 	@echo "[ERLC]" $<": "$@
 	@erlc -o ebin/ $(ECINCLUDES) $(ECFLAGS) $<
 
-priv/lib/%.so: c_src/%.c
+priv/%.so: c_src/%.c
 	@echo "[GCC]" $<": "$@
 	@gcc -o $@ $(CFLAGS) $(LDFLAGS) $<  -lerl_interface -lei -lncurses
 
 clean:
 	rm -f ebin/*.beam
-	rm -f priv/lib/*.so
+	rm -f priv/*.so
 	rm -f $(EDEF)
