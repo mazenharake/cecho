@@ -1,9 +1,9 @@
 // Copyright (c) 2010, Mazen Harake
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
-// 
+//
 //  * Redistributions of source code must retain the above copyright notice,
 //    this list of conditions and the following disclaimer.
 //  * Redistributions in binary form must reproduce the above copyright
@@ -12,7 +12,7 @@
 //  * Neither the name of the <ORGANIZATION> nor the names of its
 //    contributors may be used to endorse or promote products derived from
 //    this software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -23,7 +23,7 @@
 // INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-// POSSIBILITY OF SUCH DAMAGE.x 
+// POSSIBILITY OF SUCH DAMAGE.x
 
 // Includes
 #include <stdlib.h>
@@ -122,7 +122,7 @@ static void init_getch_loop(ErlDrvData drvstate, char *buf, int buflen) {
   driver_async(st->drv_port, NULL, loop_getch, (void *)st, NULL);
 }
 
-static int ctrl(ErlDrvData drvstate, unsigned int command, char *args, 
+static int ctrl(ErlDrvData drvstate, unsigned int command, char *args,
 		int argslen, char **rbuf, int rbuflen) {
   state *st = (state *)drvstate;
   init_state(st, args, argslen);
@@ -167,7 +167,7 @@ static int ctrl(ErlDrvData drvstate, unsigned int command, char *args,
   case KEYPAD: do_keypad(st); break;
   default: break;
   }
-  
+
   int rlen = st->eixb.index;
   ErlDrvBinary *response = driver_alloc_binary(rlen);
   memcpy(response->orig_bytes, st->eixb.buff, rlen);
@@ -289,7 +289,7 @@ void do_wattron(state *st) {
   int arity;
   long slot, attrs;
   ei_decode_tuple_header(st->args, &(st->index), &arity);
-  ei_decode_long(st->args, &(st->index), &slot);  
+  ei_decode_long(st->args, &(st->index), &slot);
   ei_decode_long(st->args, &(st->index), &attrs);
   encode_ok_reply(st, wattron(st->win[slot], (int)attrs));
 }
@@ -342,7 +342,7 @@ void do_mvaddstr(state *st) {
   ei_decode_string(st->args, &(st->index), str);
   encode_ok_reply(st, mvaddnstr((int)y, (int)x, str, (int)strlen));
 }
-   
+
 void do_newwin(state *st) {
   int slot = findfreewindowslot(st);
   if (slot > 0) {
@@ -409,7 +409,7 @@ void do_mvwaddstr(state *st) {
   int arity;
   long slot, y, x, strlen;
   ei_decode_tuple_header(st->args, &(st->index), &arity);
-  ei_decode_long(st->args, &(st->index), &slot); 
+  ei_decode_long(st->args, &(st->index), &slot);
   ei_decode_long(st->args, &(st->index), &y);
   ei_decode_long(st->args, &(st->index), &x);
   ei_decode_long(st->args, &(st->index), &strlen);
@@ -583,7 +583,7 @@ ErlDrvEntry driver_entry = {
   ctrl,
   NULL
 };
-  
+
 // =============================================================================
 // Erlang Driver Name
 // =============================================================================

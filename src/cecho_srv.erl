@@ -27,8 +27,8 @@
 
 -module(cecho_srv).
 -behaviour(gen_server).
--include("include/cecho.hrl").
--include("include/cecho_commands.hrl").
+-include("cecho.hrl").
+-include("cecho_commands.hrl").
 
 %% Behaviour Callbacks
 -export([init/1, terminate/2, handle_call/3, handle_cast/2, handle_info/2,
@@ -57,7 +57,7 @@ getch() ->
 %% =============================================================================
 init(no_args) ->
     process_flag(trap_exit, true),
-    case erl_ddll:load(code:priv_dir(cecho)++"/lib","cecho") of
+    case load_driver() of
 	ok ->
 	    Port = erlang:open_port({spawn, "cecho"}, [binary]),
 	    ok = do_call(Port, ?INITSCR),
@@ -104,3 +104,12 @@ do_call(Port, Cmd) ->
 
 do_call(Port, Cmd, Args) ->
     binary_to_term(erlang:port_control(Port, Cmd, term_to_binary(Args))).
+
+load_driver() ->
+    Dir = case code:priv_dir(cecho) of
+              {error, bad_name} ->
+                  filename:dirname(code:which(?MODULE)) ++ "/../priv";
+              D ->
+                  D
+          end,
+    erl_ddll:load(Dir, "cecho").
