@@ -8,9 +8,6 @@ BEAMS       := $(patsubst src/%, ebin/%, $(patsubst %.erl, %.beam, $(wildcard sr
 ECINCLUDES  := -I include
 ECFLAGS     := +debug_info +strict_record_tests +netload
 
-EDEF        := include/cecho_commands.hrl
-CDEF        := $(patsubst %.hrl, %.h, $(EDEF))
-
 ERLDIR      := $(shell erl -noinput -eval 'io:format("~s",[code:root_dir()]),halt().')
 ERTSVERS    := $(shell erl -noinput -eval 'io:format("~s",[erlang:system_info(version)]),halt().')
 ERLINTRFCE  := $(shell erl -noinput -eval 'io:format("~s",[filename:basename(code:lib_dir(erl_interface))]),halt().')
@@ -29,11 +26,7 @@ CFLAGS      := $(CFLAGS) -Wall -g -Iinclude -I$(ERLDIR)/erts-$(ERTSVERS)/include
                -I$(ERLDIR)/lib/$(ERLINTRFCE)/include
 LDFLAGS     := -L$(ERLDIR)/lib/$(ERLINTRFCE)/lib
 
-all: $(EDEF) $(BEAMS) $(DRIVER)
-
-$(EDEF): $(CDEF)
-	@echo "[SED]" $<": "$@
-	@sed 's|//|%%|g' $< | sed 's|.define \([A-Z\_]*\) \([0-9]*\)|-define(\1, \2).|g' > $(EDEF)
+all: $(BEAMS) $(DRIVER)
 
 ebin/%.beam: src/%.erl
 	@echo "[ERLC]" $<": "$@
