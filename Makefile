@@ -1,12 +1,10 @@
-# Make file for cecho v0.0.1
-
 .PHONY: all clean
 
 UNAME       := $(shell uname)
 
 BEAMS       := $(patsubst src/%, ebin/%, $(patsubst %.erl, %.beam, $(wildcard src/*.erl)))
 ECINCLUDES  := -I include
-ECFLAGS     := +debug_info +strict_record_tests +netload
+ECFLAGS     := +debug_info
 
 ERLDIR      := $(shell erl -noinput -eval 'io:format("~s",[code:root_dir()]),halt().')
 ERTSVERS    := $(shell erl -noinput -eval 'io:format("~s",[erlang:system_info(version)]),halt().')
