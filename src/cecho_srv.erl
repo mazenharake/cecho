@@ -61,7 +61,7 @@ init(no_args) ->
 	ok ->
 	    Port = erlang:open_port({spawn, "cecho"}, [binary]),
 	    ok = do_call(Port, ?INITSCR),
-	    ok = do_call(Port, ?ERASE),
+	    ok = do_call(Port, ?WERASE, 0),
 	    ok = do_call(Port, ?REFRESH),
 	    erlang:port_command(Port, <<>>),
 	    {ok, #state{ port = Port }};
