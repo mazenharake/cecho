@@ -117,12 +117,12 @@ static void stop(ErlDrvData drvstate) {
   driver_free(drvstate);
 }
 
-static void init_getch_loop(ErlDrvData drvstate, char *buf, int buflen) {
+static void request(ErlDrvData drvstate, char *buf, int buflen) {
   state *st = (state *)drvstate;
   driver_async(st->drv_port, NULL, loop_getch, (void *)st, NULL);
 }
 
-static int ctrl(ErlDrvData drvstate, unsigned int command, char *args,
+static int control(ErlDrvData drvstate, unsigned int command, char *args,
 		int argslen, char **rbuf, int rbuflen) {
   state *st = (state *)drvstate;
   init_state(st, args, argslen);
@@ -559,12 +559,10 @@ void loop_getch(void *arg) {
   state *st = (state *)arg;
   ei_x_buff eixb;
   int keycode;
-  while(1) {
-    ei_x_new_with_version(&eixb);
-    keycode = getch();
-    integer(&eixb, keycode);
-    driver_output(st->drv_port, eixb.buff, eixb.index);
-  }
+  ei_x_new_with_version(&eixb);
+  keycode = getch();
+  integer(&eixb, keycode);
+  driver_output(st->drv_port, eixb.buff, eixb.index);
 }
 
 // =============================================================================
@@ -574,13 +572,13 @@ ErlDrvEntry driver_entry = {
   NULL,
   start,
   stop,
-  init_getch_loop,
+  request,
   NULL,
   NULL,
   "cecho",
   NULL,
   NULL,
-  ctrl,
+  control,
   NULL
 };
 

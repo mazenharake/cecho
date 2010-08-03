@@ -38,7 +38,7 @@
 -export([start_link/0, call/2, getch/0]).
 
 %% Records
--record(state, { port, getch }).
+-record(state, { port, getch, observer }).
 
 %% =============================================================================
 %% Module API
@@ -84,8 +84,9 @@ terminate(_Reason, State) ->
 
 handle_info({_Port, {data, _Binary}}, #state{ getch = undefined } = State) ->
     {noreply, State};
-handle_info({_Port, {data, Binary}}, State) ->
+handle_info({Port, {data, Binary}}, State) ->
     gen_server:reply(State#state.getch, binary_to_term(Binary)),
+    erlang:port_command(Port, <<>>),
     {noreply, State#state{ getch = undefined }}.
 
 %% @hidden
