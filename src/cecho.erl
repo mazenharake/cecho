@@ -87,7 +87,10 @@ curs_set(Flag) when is_integer(Flag) ->
     call(?CURS_SET, Flag).
 
 erase() ->
-    call(?ERASE).
+    werase(?ceSTDSCR).
+
+werase(Window) when is_integer(Window) ->
+    call(?WERASE, Window).
 
 has_colors() ->
     call(?HAS_COLORS).

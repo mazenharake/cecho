@@ -73,7 +73,7 @@ void do_move(state *st);
 void do_getyx(state *st);
 void do_getmaxyx(state *st);
 void do_curs_set(state *st);
-void do_erase(state *st);
+void do_werase(state *st);
 void do_has_colors(state *st);
 void do_start_color(state *st);
 void do_init_pair(state *st);
@@ -141,7 +141,7 @@ static int control(ErlDrvData drvstate, unsigned int command, char *args,
   case GETYX: do_getyx(st); break;
   case GETMAXYX: do_getmaxyx(st); break;
   case CURS_SET: do_curs_set(st); break;
-  case ERASE: do_erase(st); break;
+  case WERASE: do_werase(st); break;
   case HAS_COLORS: do_has_colors(st); break;
   case START_COLOR: do_start_color(st); break;
   case INIT_PAIR: do_init_pair(st); break;
@@ -263,8 +263,10 @@ void do_curs_set(state *st) {
   ok(st);
 }
 
-void do_erase(state *st) {
-  encode_ok_reply(st, erase());
+void do_werase(state *st) {
+  long slot;
+  ei_decode_long(st->args, &(st->index), &slot);
+  encode_ok_reply(st, werase(st->win[slot]));
 }
 
 void do_has_colors(state *st) {

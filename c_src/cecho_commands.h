@@ -38,7 +38,7 @@
 #define GETYX 10
 #define GETMAXYX 11
 #define CURS_SET 12
-#define ERASE 13
+#define WERASE 13
 #define HAS_COLORS 14
 #define START_COLOR 15
 #define INIT_PAIR 16
