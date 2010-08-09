@@ -101,7 +101,7 @@ code_change(_, State, _) ->
 %% Internal Functions
 %% =============================================================================
 do_call(Port, Cmd) ->
-    do_call(Port, Cmd, []).
+    do_call(Port, Cmd, undefined).
 
 do_call(Port, Cmd, Args) ->
     binary_to_term(erlang:port_control(Port, Cmd, term_to_binary(Args))).

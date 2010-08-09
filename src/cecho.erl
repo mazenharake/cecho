@@ -210,7 +210,7 @@ stop(_) ->
 %% Internal Functions
 %% =============================================================================
 call(Cmd) ->
-    call(Cmd, []).
+    call(Cmd, undefined).
 
 call(Cmd, Args) ->
     cecho_srv:call(Cmd, Args).
