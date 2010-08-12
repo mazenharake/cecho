@@ -114,9 +114,14 @@ static void stop(ErlDrvData drvstate) {
   driver_free(drvstate);
 }
 
-static void request(ErlDrvData drvstate, char *buf, int buflen) {
+static void do_getch(ErlDrvData drvstate, ErlDrvEvent event) {
   state *st = (state *)drvstate;
-  driver_async(st->drv_port, NULL, loop_getch, (void *)st, NULL);
+  ei_x_buff eixb;
+  int keycode;
+  ei_x_new_with_version(&eixb);
+  keycode = getch();
+  integer(&eixb, keycode);
+  driver_output(st->drv_port, eixb.buff, eixb.index);
 }
 
 static int control(ErlDrvData drvstate, unsigned int command, char *args,
@@ -182,6 +187,7 @@ void do_endwin(state *st) {
 
 void do_initscr(state *st) {
   st->win[0] = (WINDOW *)initscr();
+  driver_select(st->drv_port, (ErlDrvEvent)fileno(stdin), DO_READ, 1);
   if (st->win[0] == NULL) {
     encode_ok_reply(st, -1);
   } else {
@@ -554,16 +560,6 @@ int findfreewindowslot(state *st) {
   return -1;
 }
 
-void loop_getch(void *arg) {
-  state *st = (state *)arg;
-  ei_x_buff eixb;
-  int keycode;
-  ei_x_new_with_version(&eixb);
-  keycode = getch();
-  integer(&eixb, keycode);
-  driver_output(st->drv_port, eixb.buff, eixb.index);
-}
-
 // =============================================================================
 // Erlang driver_entry Specification
 // ===========================================================================
@@ -571,8 +567,8 @@ ErlDrvEntry driver_entry = {
   NULL,
   start,
   stop,
-  request,
   NULL,
+  do_getch,
   NULL,
   "cecho",
   NULL,

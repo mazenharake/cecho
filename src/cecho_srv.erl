@@ -60,7 +60,6 @@ init(no_args) ->
 	    ok = do_call(Port, ?INITSCR),
 	    ok = do_call(Port, ?WERASE, 0),
 	    ok = do_call(Port, ?REFRESH),
-	    erlang:port_command(Port, <<>>),
 	    {ok, #state{ port = Port }};
 	{error, ErrorCode} ->
 	    exit({driver_error, erl_ddll:format_error(ErrorCode)})
@@ -81,9 +80,8 @@ terminate(_Reason, State) ->
 
 handle_info({_Port, {data, _Binary}}, #state{ getch = undefined } = State) ->
     {noreply, State};
-handle_info({Port, {data, Binary}}, State) ->
+handle_info({_Port, {data, Binary}}, State) ->
     gen_server:reply(State#state.getch, binary_to_term(Binary)),
-    erlang:port_command(Port, <<>>),
     {noreply, State#state{ getch = undefined }}.
 
 %% @hidden
