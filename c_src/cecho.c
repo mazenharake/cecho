@@ -111,6 +111,8 @@ static ErlDrvData start(ErlDrvPort port, char *command) {
 }
 
 static void stop(ErlDrvData drvstate) {
+  state *st = (state *)drvstate;
+  driver_select(st->drv_port, (ErlDrvEvent)fileno(stdin), DO_READ, 0);
   driver_free(drvstate);
 }
 
