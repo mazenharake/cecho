@@ -25,6 +25,11 @@
 #include "ncurses.h"
 #include "assert.h"
 
+#if ERL_DRV_EXTENDED_MAJOR_VERSION < 2
+#define ErlDrvSizeT int
+#define ErlDrvSSizeT int
+#endif
+
 // State structure
 typedef struct {
   WINDOW *win[_MAXWINDOWS+1];
@@ -104,7 +109,7 @@ static ErlDrvData start(ErlDrvPort port, char *command) {
 
 static void stop(ErlDrvData drvstate) {
   state *st = (state *)drvstate;
-  driver_select(st->drv_port, (ErlDrvEvent)fileno(stdin), DO_READ, 0);
+  driver_select(st->drv_port, (ErlDrvEvent)(size_t)fileno(stdin), DO_READ, 0);
   driver_free(drvstate);
 }
 
@@ -118,8 +123,9 @@ static void do_getch(ErlDrvData drvstate, ErlDrvEvent event) {
   driver_output(st->drv_port, eixb.buff, eixb.index);
 }
 
-static int control(ErlDrvData drvstate, unsigned int command, char *args,
-		int argslen, char **rbuf, int rbuflen) {
+static ErlDrvSSizeT control(ErlDrvData drvstate, unsigned int command,
+			    char *args, ErlDrvSizeT argslen,
+			    char **rbuf, ErlDrvSizeT rbuflen) {
   state *st = (state *)drvstate;
   init_state(st, args, argslen);
 
@@ -181,7 +187,7 @@ void do_endwin(state *st) {
 
 void do_initscr(state *st) {
   st->win[0] = (WINDOW *)initscr();
-  driver_select(st->drv_port, (ErlDrvEvent)fileno(stdin), DO_READ, 1);
+  driver_select(st->drv_port, (ErlDrvEvent)(size_t)fileno(stdin), DO_READ, 1);
   if (st->win[0] == NULL) {
     encode_ok_reply(st, -1);
   } else {
@@ -568,7 +574,15 @@ ErlDrvEntry driver_entry = {
   NULL,
   NULL,
   control,
-  NULL
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  ERL_DRV_EXTENDED_MARKER,
+  ERL_DRV_EXTENDED_MAJOR_VERSION,
+  ERL_DRV_EXTENDED_MINOR_VERSION
 };
 
 // =============================================================================
