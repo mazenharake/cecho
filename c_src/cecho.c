@@ -109,7 +109,7 @@ static ErlDrvData start(ErlDrvPort port, char *command) {
 
 static void stop(ErlDrvData drvstate) {
   state *st = (state *)drvstate;
-  driver_select(st->drv_port, (ErlDrvEvent)fileno(stdin), DO_READ, 0);
+  driver_select(st->drv_port, (ErlDrvEvent)(size_t)fileno(stdin), DO_READ, 0);
   driver_free(drvstate);
 }
 
@@ -187,7 +187,7 @@ void do_endwin(state *st) {
 
 void do_initscr(state *st) {
   st->win[0] = (WINDOW *)initscr();
-  driver_select(st->drv_port, (ErlDrvEvent)fileno(stdin), DO_READ, 1);
+  driver_select(st->drv_port, (ErlDrvEvent)(size_t)fileno(stdin), DO_READ, 1);
   if (st->win[0] == NULL) {
     encode_ok_reply(st, -1);
   } else {
