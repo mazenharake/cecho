@@ -25,6 +25,11 @@
 #include "ncurses.h"
 #include "assert.h"
 
+#if ERL_DRV_EXTENDED_MAJOR_VERSION < 2
+#define ErlDrvSizeT int
+#define ErlDrvSSizeT int
+#endif
+
 // State structure
 typedef struct {
   WINDOW *win[_MAXWINDOWS+1];
@@ -118,8 +123,9 @@ static void do_getch(ErlDrvData drvstate, ErlDrvEvent event) {
   driver_output(st->drv_port, eixb.buff, eixb.index);
 }
 
-static int control(ErlDrvData drvstate, unsigned int command, char *args,
-		int argslen, char **rbuf, int rbuflen) {
+static ErlDrvSSizeT control(ErlDrvData drvstate, unsigned int command,
+			    char *args, ErlDrvSizeT argslen,
+			    char **rbuf, ErlDrvSizeT rbuflen) {
   state *st = (state *)drvstate;
   init_state(st, args, argslen);
 
@@ -568,7 +574,15 @@ ErlDrvEntry driver_entry = {
   NULL,
   NULL,
   control,
-  NULL
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  ERL_DRV_EXTENDED_MARKER,
+  ERL_DRV_EXTENDED_MAJOR_VERSION,
+  ERL_DRV_EXTENDED_MINOR_VERSION
 };
 
 // =============================================================================
