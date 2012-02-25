@@ -6,6 +6,14 @@ Introduction
 ------------
 Cecho is an ncurses library for Erlang which enabled Erlang applications to create terminal based GUIs. It aims to have an API as close as possible to the original API of ncurses so that a person familiar with ncurses API should be able to immediately use it without any introduction.
 
+
+Compile
+-------
+To clean/compile run
+
+    ./rebar clean
+    ./rebar compile
+
 Usage
 -----
 The intention of this library is to have an API as close as possible to the ncurses library. Something things can't be translated and other things return values instead of taking pointer arguments etc. but overall the API should be similar enough to make use of the ncurses documentation that is out on the web.
