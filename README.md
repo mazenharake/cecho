@@ -1,21 +1,17 @@
-cecho
-=====
+# cecho
 An ncurses library for Erlang
 
-Introduction
-------------
+## Introduction
 Cecho is an ncurses library for Erlang which enabled Erlang applications to create terminal based GUIs. It aims to have an API as close as possible to the original API of ncurses so that a person familiar with ncurses API should be able to immediately use it without any introduction.
 
 
-Compile
--------
+## Compile
 To clean/compile run
 
     ./rebar clean
     ./rebar compile
 
-Usage
------
+## Usage
 The intention of this library is to have an API as close as possible to the ncurses library. Something things can't be translated and other things return values instead of taking pointer arguments etc. but overall the API should be similar enough to make use of the ncurses documentation that is out on the web.
 
 The following sequence is more or less standard when using the library:
@@ -119,9 +115,7 @@ and save it, then make it executable and run it from the cecho directory:
 IMPORTANT:
 If input will be used (cecho:getch/0) then the two flags '-noinput' and +A <N> _must_ be used. The reason is that if '-noinput' is not specified the erlang VM will interfere with the reading of the keys. The second reason is that in order to asynchronously read the input Erlang need more io threads; however it doesn't seem to be enough to specify e.g. 10 in some cases and the reason is not known. If a "high enough number" is specified then the input will work very well.
 
-
-Contribute
-----------
+## Contribute
 Should you find yourself using cecho and have issues, comments or feedback please [create an issue!] [1]
 
 [1]: http://github.com/mazenharake/cecho/issues "cecho issues"
