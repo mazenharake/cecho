@@ -226,7 +226,7 @@ void do_addstr(state *st) {
   long strlen;
   ei_decode_tuple_header(st->args, &(st->index), &arity);
   ei_decode_long(st->args, &(st->index), &strlen);
-  char str[strlen];
+  char str[strlen+1];
   ei_decode_string(st->args, &(st->index), str);
   encode_ok_reply(st, addnstr(str, strlen));
 }
@@ -344,7 +344,7 @@ void do_mvaddstr(state *st) {
   ei_decode_long(st->args, &(st->index), &y);
   ei_decode_long(st->args, &(st->index), &x);
   ei_decode_long(st->args, &(st->index), &strlen);
-  char str[strlen];
+  char str[strlen+1];
   ei_decode_string(st->args, &(st->index), str);
   encode_ok_reply(st, mvaddnstr((int)y, (int)x, str, (int)strlen));
 }
@@ -396,7 +396,7 @@ void do_waddstr(state *st) {
   ei_decode_tuple_header(st->args, &(st->index), &arity);
   ei_decode_long(st->args, &(st->index), &slot);
   ei_decode_long(st->args, &(st->index), &strlen);
-  char str[strlen];
+  char str[strlen+1];
   ei_decode_string(st->args, &(st->index), str);
   encode_ok_reply(st, waddnstr(st->win[slot], str, strlen));
 }
@@ -419,7 +419,7 @@ void do_mvwaddstr(state *st) {
   ei_decode_long(st->args, &(st->index), &y);
   ei_decode_long(st->args, &(st->index), &x);
   ei_decode_long(st->args, &(st->index), &strlen);
-  char str[strlen];
+  char str[strlen+1];
   ei_decode_string(st->args, &(st->index), str);
   encode_ok_reply(st, mvwaddnstr(st->win[slot], (int)y, (int)x, str, strlen));
 }
