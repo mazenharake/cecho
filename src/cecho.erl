@@ -29,7 +29,7 @@
 %% Application API
 
 -export([refresh/0, cbreak/0, nocbreak/0, echo/0, noecho/0, addch/1, addstr/1,
-	 move/2, getyx/0, getmaxyx/0, curs_set/1, erase/0, has_colors/0,
+	 move/2, getyx/0, getmaxyx/0, curs_set/1, werase/1, erase/0, has_colors/0,
 	 start_color/0, init_pair/3, attron/1, attroff/1, nl/0, nonl/0,
 	 scrollok/2, mvaddch/3, mvaddstr/3, newwin/4, delwin/1, wmove/3,
 	 waddstr/2, waddch/2, mvwaddstr/4, mvwaddch/4, wrefresh/1, hline/2,
