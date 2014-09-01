@@ -278,6 +278,7 @@ void do_has_colors(state *st) {
 }
 
 void do_start_color(state *st) {
+  use_default_colors();
   encode_ok_reply(st, start_color());
 }
 
