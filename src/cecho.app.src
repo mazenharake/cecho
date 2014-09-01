@@ -1,0 +1,11 @@
+{application, cecho,
+ [
+  {description, "ncurses api for erlang"},
+  {vsn, git},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { cecho, []}}
+ ]}.
