@@ -224,11 +224,18 @@ void do_addch(state *st) {
 void do_addstr(state *st) {
   int arity;
   long strlen;
+  char *str = NULL;
+  int code = 0;
   ei_decode_tuple_header(st->args, &(st->index), &arity);
   ei_decode_long(st->args, &(st->index), &strlen);
-  char str[strlen];
+  if ( (str = calloc(strlen+1, 1)) == NULL) {
+      encode_ok_reply(st, ENOMEM);
+      return;
+  }
   ei_decode_string(st->args, &(st->index), str);
-  encode_ok_reply(st, addnstr(str, strlen));
+  code = addnstr(str, strlen);
+  free(str);
+  encode_ok_reply(st, code);
 }
 
 void do_move(state *st) {
@@ -341,13 +348,20 @@ void do_mvaddch(state *st) {
 void do_mvaddstr(state *st) {
   int arity;
   long strlen, y, x;
+  char *str = NULL;
+  int code = 0;
   ei_decode_tuple_header(st->args, &(st->index), &arity);
   ei_decode_long(st->args, &(st->index), &y);
   ei_decode_long(st->args, &(st->index), &x);
   ei_decode_long(st->args, &(st->index), &strlen);
-  char str[strlen];
+  if ( (str = calloc(strlen+1, 1)) == NULL) {
+      encode_ok_reply(st, ENOMEM);
+      return;
+  }
   ei_decode_string(st->args, &(st->index), str);
-  encode_ok_reply(st, mvaddnstr((int)y, (int)x, str, (int)strlen));
+  code = mvaddnstr((int)y, (int)x, str, (int)strlen);
+  free(str);
+  encode_ok_reply(st, code);
 }
 
 void do_newwin(state *st) {
@@ -394,12 +408,19 @@ void do_wmove(state *st) {
 void do_waddstr(state *st) {
   int arity;
   long slot, strlen;
+  char *str = NULL;
+  int code = 0;
   ei_decode_tuple_header(st->args, &(st->index), &arity);
   ei_decode_long(st->args, &(st->index), &slot);
   ei_decode_long(st->args, &(st->index), &strlen);
-  char str[strlen];
+  if ( (str = calloc(strlen+1, 1)) == NULL) {
+      encode_ok_reply(st, ENOMEM);
+      return;
+  }
   ei_decode_string(st->args, &(st->index), str);
-  encode_ok_reply(st, waddnstr(st->win[slot], str, strlen));
+  code = waddnstr(st->win[slot], str, strlen);
+  free(str);
+  encode_ok_reply(st, code);
 }
 
 void do_waddch(state *st) {
@@ -415,14 +436,21 @@ void do_waddch(state *st) {
 void do_mvwaddstr(state *st) {
   int arity;
   long slot, y, x, strlen;
+  char *str = NULL;
+  int code = 0;
   ei_decode_tuple_header(st->args, &(st->index), &arity);
   ei_decode_long(st->args, &(st->index), &slot);
   ei_decode_long(st->args, &(st->index), &y);
   ei_decode_long(st->args, &(st->index), &x);
   ei_decode_long(st->args, &(st->index), &strlen);
-  char str[strlen];
+  if ( (str = calloc(strlen+1, 1)) == NULL) {
+      encode_ok_reply(st, ENOMEM);
+      return;
+  }
   ei_decode_string(st->args, &(st->index), str);
-  encode_ok_reply(st, mvwaddnstr(st->win[slot], (int)y, (int)x, str, strlen));
+  code = mvwaddnstr(st->win[slot], (int)y, (int)x, str, strlen);
+  free(str);
+  encode_ok_reply(st, code);
 }
 
 void do_mvwaddch(state *st) {
