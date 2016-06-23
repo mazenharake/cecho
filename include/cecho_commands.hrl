@@ -51,3 +51,4 @@
 -define(WBORDER, 34).
 -define(BOX, 35).
 -define(KEYPAD, 36).
+-define(TOUCHWIN, 37).
