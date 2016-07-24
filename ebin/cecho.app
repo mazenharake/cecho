@@ -3,4 +3,6 @@
   {vsn, "0.0.3"},
   {modules, [cecho, cecho_srv, cecho_example]},
   {env, []},
+  {applications, []},
+  {registered, []},
   {mod, {cecho, []}}]}.
