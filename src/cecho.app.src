@@ -1,6 +1,6 @@
 {application, cecho,
  [{description, "An ncurses library for Erlang"},
-  {vsn, "0.5.0"},
+  {vsn, "0.0.4"},
   {registered, []},
   {mod, { cecho, []}},
   {applications,
@@ -8,7 +8,7 @@
     stdlib
    ]},
   {env,[]},
-  {modules, []},
+  {modules, [cecho, cecho_srv, cecho_example]},
 
   {maintainers, []},
   {licenses, ["Apache 2.0"]},
