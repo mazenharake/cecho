@@ -8,8 +8,8 @@ Cecho is an ncurses library for Erlang which enabled Erlang applications to crea
 ## Compile
 To clean/compile run
 
-    ./rebar clean
-    ./rebar compile
+    ./rebar3 clean
+    ./rebar3 compile
 
 ## Usage
 The intention of this library is to have an API as close as possible to the ncurses library. Something things can't be translated and other things return values instead of taking pointer arguments etc. but overall the API should be similar enough to make use of the ncurses documentation that is out on the web.
@@ -98,12 +98,12 @@ Examples on how to run the helloworld example (make sure you have compiled cecho
 
 From the cecho directory do:
 
-    $> erl -noinput -pa ../cecho/ebin/ -eval 'cecho_example:helloworld()' +A 50
+    $> erl -noinput -pa ../cecho/_build/default/lib/cecho/ebin/ -eval 'cecho_example:helloworld()' +A 50
 
 Or create an escript file as follows:
    
     #!/usr/bin/env escript
-    %%! -noinput -pa ../cecho/ebin +A 50
+    %%! -noinput -pa ../cecho/_build/default/lib/cecho/ebin +A 50
     -include_lib("cecho/include/cecho.hrl").
     main(_) -> cecho_example:helloworld().
 

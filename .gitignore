@@ -2,3 +2,5 @@
 priv/*.so
 priv/lib/*
 c_src/*.o
+_build
+rebar.lock
