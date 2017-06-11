@@ -136,8 +136,7 @@ colors() ->
     ok = cecho:init_pair(6, ?ceCOLOR_BLACK, ?ceCOLOR_CYAN),
     ok = cecho:init_pair(7, ?ceCOLOR_BLACK, ?ceCOLOR_WHITE),
     ok = cecho:init_pair(8, ?ceCOLOR_BLACK, ?ceCOLOR_BLACK),
-    {A, B, C} = erlang:now(),
-    random:seed(A, B, C),
+    rand_seed(),
     {MaxRow, MaxCol} = cecho:getmaxyx(),
     cecho:move(10,10),
     cecho:addstr(io_lib:format("Max Row: ~p, Max Col: ~p",[MaxRow, MaxCol])),
@@ -163,14 +162,26 @@ do_colors(MR,MC,N) ->
 
 ch_colors(_,_,0) -> ok;
 ch_colors(MR, MC, N) ->
-    R = random:uniform(MR)-1,
-    C = random:uniform(MC)-1,
-    CN = random:uniform(8),
+    R = rand_uniform(MR)-1,
+    C = rand_uniform(MC)-1,
+    CN = rand_uniform(8),
     cecho:attron(?ceCOLOR_PAIR(CN)),
     cecho:move(R, C),
     cecho:addch($ ),
     cecho:move(R, C),
     ch_colors(MR, MC, N-1).
+
+-ifdef(random_module_available).
+rand_seed() ->
+  random:seed(os:timestamp()).
+rand_uniform(N) ->
+  random:uniform(N).
+-else.
+rand_seed() ->
+  ok.
+rand_uniform(N) ->
+  rand:uniform(N).
+-endif.
 
 %%
 %% Simply puts an @ character somewhere. If you go out of bounds you crash
