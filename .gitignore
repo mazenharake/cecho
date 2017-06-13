@@ -1,6 +1,6 @@
-*.beam
-priv/*.so
-priv/lib/*
+.rebar3
+ebin
+priv
 c_src/*.o
 _build
 rebar.lock
