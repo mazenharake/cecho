@@ -2,5 +2,6 @@
 ebin
 priv
 c_src/*.o
+c_src/*.d
 _build
 rebar.lock
