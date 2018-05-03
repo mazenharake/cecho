@@ -28,9 +28,16 @@
 
 -author('mazen.harake@gmail.com').
 
--compile(export_all).
-
 -include("cecho.hrl").
+
+-export ([countdown/0,
+          simple/0,
+          colors/0,
+          pos/2,
+          input/0, input_counter/1,
+          cursmove/0,
+          helloworld/0
+         ]).
 
 %%
 %% Simple countdown which shows how to print, move and get coordinates
