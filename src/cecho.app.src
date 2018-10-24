@@ -1,6 +1,6 @@
 {application, cecho,
  [{description, "An ncurses library for Erlang"},
-  {vsn, "0.5.2"},
+  {vsn, "0.5.3"},
   {registered, []},
   {mod, { cecho, []}},
   {applications,
