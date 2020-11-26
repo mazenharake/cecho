@@ -95,7 +95,7 @@ handle_cast(_, State) ->
 
 %% @hidden
 code_change(_, State, _) ->
-    {noreply, State}.
+    {ok, State}.
 
 %% =============================================================================
 %% Internal Functions
