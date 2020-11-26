@@ -30,7 +30,13 @@
 #include "cecho.h"
 #include "cecho_commands.h"
 #include "erl_driver.h"
-#include "erl_interface.h"
+#if defined __has_include // Check if __has_include is present
+#  if __has_include ("erl_interface.h")
+#    include "erl_interface.h"
+#  endif
+#elif defined(INCLUDE_ERL_INTERFACE) // Try with rebar3 defined attribute
+#  include "erl_interface.h"
+#endif
 #include "ei.h"
 #include "ncurses.h"
 #include "assert.h"
