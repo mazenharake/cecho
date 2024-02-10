@@ -91,6 +91,7 @@
 -define(ceKEY_LEFT, 260).
 -define(ceKEY_RIGHT, 261).
 -define(ceKEY_HOME, 262).
+-define(ceKEY_BACKSPACE, 263).
 -define(ceKEY_F(N), 264+N).
 -define(ceKEY_DEL, 330).
 -define(ceKEY_INS, 331).
