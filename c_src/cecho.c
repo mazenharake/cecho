@@ -55,6 +55,7 @@ typedef struct {
   int index;
   int version;
   ErlDrvPort drv_port;
+  char is_stdin_attached;
 } state;
 
 void init_state(state *st, char *args, int argslen);
@@ -116,6 +117,7 @@ void do_touchwin(state *st);
 // =============================================================================
 static ErlDrvData start(ErlDrvPort port, char *command) {
   state *drvstate = (state *)driver_alloc(sizeof(state));
+  drvstate->is_stdin_attached = 0;
   drvstate->drv_port = port;
   set_port_control_flags(port, PORT_CONTROL_FLAG_BINARY);
   int i;
@@ -124,16 +126,30 @@ static ErlDrvData start(ErlDrvPort port, char *command) {
   return (ErlDrvData)drvstate;
 }
 
+static void detach_stdin(state *st) {
+  if (st->is_stdin_attached) {
+    driver_select(st->drv_port, (ErlDrvEvent)(size_t)fileno(stdin), ERL_DRV_READ, 0);
+    st->is_stdin_attached = 0;
+  }
+}
+
 static void stop(ErlDrvData drvstate) {
-  state *st = (state *)drvstate;
-  driver_select(st->drv_port, (ErlDrvEvent)(size_t)fileno(stdin), DO_READ, 0);
+  detach_stdin((state *)drvstate);
   driver_free(drvstate);
+}
+
+static void require_stdin(state *st) {
+  if (!st->is_stdin_attached) {
+    driver_select(st->drv_port, (ErlDrvEvent)(size_t)fileno(stdin), ERL_DRV_READ, 1);
+    st->is_stdin_attached = 1;
+  }
 }
 
 static void do_getch(ErlDrvData drvstate, ErlDrvEvent event) {
   state *st = (state *)drvstate;
   ei_x_buff eixb;
   int keycode;
+  require_stdin(st);
   ei_x_new_with_version(&eixb);
   keycode = getch();
   integer(&eixb, keycode);
@@ -200,12 +216,13 @@ static ErlDrvSSizeT control(ErlDrvData drvstate, unsigned int command,
 // NCurses function wrappers
 // ===========================================================================
 void do_endwin(state *st) {
+  detach_stdin(st);
   encode_ok_reply(st, endwin());
 }
 
 void do_initscr(state *st) {
   st->win[0] = (WINDOW *)initscr();
-  driver_select(st->drv_port, (ErlDrvEvent)(size_t)fileno(stdin), DO_READ, 1);
+  require_stdin(st);
   if (st->win[0] == NULL) {
     encode_ok_reply(st, -1);
   } else {
@@ -214,6 +231,7 @@ void do_initscr(state *st) {
 }
 
 void do_refresh(state *st) {
+  require_stdin(st);
   encode_ok_reply(st, refresh());
 }
 
